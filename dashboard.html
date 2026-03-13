@@ -3,135 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Agenda de Professores</title>
-    <style>
-        :root {
-            --verde-fundo: #90EE90;
-            --verde-primario: #004d33; /* O verde da sua imagem */
-            --branco: #ffffff;
-            --cinza-claro: #f4f4f4;
-        }
-
-        body {
-            background-color: var(--verde-fundo);
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            color: var(--verde-primario);
-            margin-bottom: 30px;
-        }
-
-        .dashboard-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: var(--branco);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            animation: fadeIn 0.5s ease;
-        }
-
-        h2 {
-            color: var(--verde-primario);
-            border-bottom: 2px solid var(--verde-fundo);
-            padding-bottom: 10px;
-            margin-top: 0;
-            font-size: 1.2rem;
-        }
-
-        .item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--cinza-claro);
-        }
-
-        .item:last-child { border-bottom: none; }
-
-        .hora {
-            font-weight: bold;
-            color: var(--verde-primario);
-            background: var(--verde-fundo);
-            padding: 4px 8px;
-            border-radius: 5px;
-            font-size: 0.85rem;
-        }
-
-        .info strong { display: block; color: #333; }
-        .info span { font-size: 0.8rem; color: #777; }
-
-        .badge-pendente {
-            background-color: #ffcccb;
-            color: #d32f2f;
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+    <title>Dashboard - Agenda do Professor</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 </head>
-<body>
+<body class="bg-light">
+    <header class="top-nav">
+        <div class="nav-logo">
+            <span class="material-symbols-outlined">menu_book</span>
+            <span>Agenda do Professor</span>
+        </div>
+        <button class="btn-logout" onclick="logout()">
+            <span class="material-symbols-outlined">logout</span> Sair
+        </button>
+    </header>
+<img src="./unifametro.jpg" class="dashboard-page" alt="Fundo da página">
+    <main class="content">
+        <header class="welcome">
+            <h1>Minha agenda!</h1>
+            <p>Bem-vindo de volta. Confira seus compromissos.</p>
+        </header>
 
-    <div class="header">
-        <h1>Minha Agenda Acadêmica</h1>
-        <p>Bem-vindo, Professor!</p>
-    </div>
-
-    <div class="dashboard-container">
-        
-        <div class="card">
-            <h2>Próximas Aulas</h2>
-            <div class="item">
-                <div class="info">
-                    <strong>Cálculo Diferencial I</strong>
-                    <span>Sala 302 - Bloco A</span>
-                </div>
-                <div class="hora">08:00</div>
+        <div class="grid-cards">
+            <div class="dash-card">
+                <div class="icon-box"><span class="material-symbols-outlined">menu_book</span></div>
+                <h3>Aulas</h3>
+                <p>Gerencie suas aulas e disciplinas</p>
+                <div class="status-label"><span>12</span> pendentes</div>
             </div>
-            <div class="item">
-                <div class="info">
-                    <strong>Estrutura de Dados</strong>
-                    <span>Laboratório 05</span>
-                </div>
-                <div class="hora">10:00</div>
+            <div class="dash-card">
+                <div class="icon-box"><span class="material-symbols-outlined">schedule</span></div>
+                <h3>Horários</h3>
+                <p>Visualize e organize seus horários</p>
+                <div class="status-label"><span>6</span> pendentes</div>
+            </div>
+            <div class="dash-card">
+                <div class="icon-box"><span class="material-symbols-outlined">groups</span></div>
+                <h3>Reuniões</h3>
+                <p>Acompanhe reuniões agendadas</p>
+                <div class="status-label"><span>3</span> pendentes</div>
+            </div>
+            <div class="dash-card">
+                <div class="icon-box"><span class="material-symbols-outlined">calendar_month</span></div>
+                <h3>Eventos</h3>
+                <p>Confira eventos acadêmicos</p>
+                <div class="status-label"><span>5</span> pendentes</div>
             </div>
         </div>
-
-        <div class="card">
-            <h2>Pendências Urgentes</h2>
-            <div class="item">
-                <div class="info">
-                    <strong>Lançar Notas - AV1</strong>
-                    <span>Engenharia de Software</span>
-                </div>
-                <span class="badge-pendente">Hoje</span>
-            </div>
-            <div class="item">
-                <div class="info">
-                    <strong>Reunião de Colegiado</strong>
-                    <span>Auditório Principal</span>
-                </div>
-                <span class="badge-pendente">Amanhã</span>
-            </div>
-        </div>
-
-    </div>
-
+    </main>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -1,0 +1,121 @@
+:root {
+    --green-main: #2d6a4f;
+    --green-light: #e8f5e9;
+    --gray-text: #666;
+    --border-color: #eee;
+}
+
+body { font-family: sans-serif; margin: 0; padding: 0; }
+.bg-light { background-color: #fcfcfc; }
+
+.dashboard-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1; /* Coloca a imagem atrás do conteúdo */
+    opacity: 0.3; /* Deixa a imagem mais clara para não competir com o conteúdo */
+}
+
+/* Layout Login */
+.split-container { display: flex; height: 100vh; }
+.banner-side { flex: 1; background: var(--green-main); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+.form-side { flex: 1; display: flex; justify-content: center; align-items: center; }
+.logo-circle { background: rgba(255,255,255,0.2); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+.logo-circle span { font-size: 40px; }
+
+/* Form Login */
+.login-box { width: 100%; max-width: 350px; }
+.input-group { margin-bottom: 15px; }
+.input-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+.password-field { position: relative; }
+.toggle-eye { position: absolute; right: 10px; top: 10px; cursor: pointer; color: #999; }
+.btn-primary { width: 100%; padding: 14px; background: var(--green-main); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+.link-forgot { display: block; text-align: center; margin-top: 20px; color: var(--green-main); text-decoration: none; font-size: 14px; }
+
+/* Dashboard */
+.top-nav { display: flex; justify-content: space-between; padding: 15px 50px; border-bottom: 1px solid var(--border-color); background: white; }
+.nav-logo { display: flex; align-items: center; gap: 10px; color: var(--green-main); font-weight: bold; }
+.btn-logout { background: none; border: none; display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; }
+
+.content { padding: 40px 50px; }
+.grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+.dash-card { background: white; border: 1px solid var(--border-color); padding: 25px; border-radius: 12px; transition: 0.3s; cursor: pointer; }
+.dash-card:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+.icon-box { background: var(--green-light); color: var(--green-main); width: 45px; height: 45px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
+.status-label { color: var(--green-main); font-size: 14px; margin-top: 15px; }
+.status-label span { background: var(--green-light); padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+
+/* Estado natural do card */
+.dash-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    padding: 25px;
+    border-radius: 12px;
+    
+    /* Transição suave para todas as propriedades */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    
+    cursor: pointer;
+    position: relative;
+    overflow: hidden; /* Garante que efeitos internos não vazem */
+}
+
+/* Efeito ao passar o mouse */
+.dash-card:hover {
+    /* 1. Elevação com sombra mais profunda */
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    
+    /* 2. Mudança sutil na borda para a cor principal */
+    border-color: var(--green-main);
+}
+
+/* Efeito extra: animar o ícone dentro do card no hover */
+.dash-card:hover .icon-box {
+    background-color: var(--green-main);
+    color: white;
+    transform: scale(1.1);
+    transition: all 0.3s ease;
+}
+
+/* Efeito extra: destacar o texto de pendências */
+.dash-card:hover .status-label span {
+    background-color: var(--green-main);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+/* Estado inicial do botão (Verde Claro) */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--green-light); /* Começa com o verde claro */
+    color: var(--green-main);            /* Texto com o verde original */
+    border: 2px solid var(--green-main);  /* Borda para definir o botão */
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    
+    /* Transição suave para a troca de cores */
+    transition: all 0.3s ease;
+}
+
+/* Estado quando o mouse passa por cima (Hover - Verde Original) */
+.btn-primary:hover {
+    background-color: var(--green-main); /* Fica o verde original */
+    color: white;                        /* Texto muda para branco para dar contraste */
+    transform: scale(1.02);              /* Dá um leve aumento de tamanho */
+    box-shadow: 0 4px 10px rgba(45, 106, 79, 0.3); /* Sombra suave esverdeada */
+}
+
+/* Efeito ao clicar (Active) */
+.btn-primary:active {
+    transform: scale(0.98); /* Efeito de 'pressionar' o botão */
+}
+

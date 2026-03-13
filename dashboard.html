@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Agenda do Professor</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+<body class="bg-light">
+    <header class="top-nav">
+        <div class="nav-logo">
+            <span class="material-symbols-outlined">menu_book</span>
+            <span>Agenda do Professor</span>
+        </div>
+        <button class="btn-logout" onclick="logout()">
+            <span class="material-symbols-outlined">logout</span> Sair
+        </button>
+    </header>
+<img src="./unifametro.jpg" class="dashboard-page" alt="Fundo da página">
+    <main class="content">
+        <header class="welcome">
+            <h1>Minha agenda!</h1>
+            <p>Bem-vindo de volta. Confira seus compromissos.</p>
+        </header>
+
+        <div class="grid-cards">
+            <div class="dash-card">
+                <div class="icon-box"><span class="material-symbols-outlined">menu_book</span></div>
+                <h3>Aulas</h3>
+                <p>Gerencie suas aulas e disciplinas</p>
+                <div class="status-label"><span>12</span> pendentes</div>
+            </div>
+            <div class="dash-card">
+                <div class="icon-box"><span class="material-symbols-outlined">schedule</span></div>
+                <h3>Horários</h3>
+                <p>Visualize e organize seus horários</p>
+                <div class="status-label"><span>6</span> pendentes</div>
+            </div>
+            <div class="dash-card">
+                <div class="icon-box"><span class="material-symbols-outlined">groups</span></div>
+                <h3>Reuniões</h3>
+                <p>Acompanhe reuniões agendadas</p>
+                <div class="status-label"><span>3</span> pendentes</div>
+            </div>
+            <div class="dash-card">
+                <div class="icon-box"><span class="material-symbols-outlined">calendar_month</span></div>
+                <h3>Eventos</h3>
+                <p>Confira eventos acadêmicos</p>
+                <div class="status-label"><span>5</span> pendentes</div>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

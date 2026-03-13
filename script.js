@@ -17,7 +17,7 @@ function togglePassword() {
 
 // Lógica de Logout
 function logout() {
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
 }
 
 function togglePassword() {

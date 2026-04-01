@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Professor - Sistema Escolar</title>
+    <link rel="stylesheet" href="cadastro.css">
+
+</head>
+<body>
+    
+    <div class="cadastro-container">
+
+        <div class="icon-header">
+            <div class="icon-circle">
+                <img src="./agendab.png" alt="Ícone de Graduação">
+            </div>
+        </div>
+
+        <form class="form-content">
+            <h2>Criar Nova Conta</h2>
+            <p>Preencha os dados abaixo para acessar a plataforma.</p>
+
+            <div class="input-group">
+                <label for="nome">Nome Completo</label>
+                <input type="text" id="nome" placeholder="Digite seu nome completo" required>
+            </div>
+
+            <div class="input-group">
+                <label for="email">E-mail Institucional</label>
+                <input type="email" id="email" placeholder="professor@universidade.com" required>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="matricula">Matrícula/CPF</label>
+                    <input type="text" id="matricula" placeholder="000.000.000-00" required>
+                </div>
+                <div class="input-group">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" placeholder="******" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-cadastrar">Finalizar Cadastro</button>
+            
+            <div class="footer-links">
+                <span>Já tem uma conta?</span>
+                <a href="login.html">Faça login aqui</a>
+            </div>
+        </form>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,119 @@
+/* Variáveis Globais (Necessárias para as cores) */
+:root {
+    --green-main: #2d6a4f;
+    --green-light: #e8f5e9;
+    --gray-text: #666;
+    --border-color: #eee;
+}
+
+body { 
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+    margin: 0; 
+    padding: 0; 
+    overflow: hidden; /* Evita scrolls desnecessários no login */
+}
+
+/* Layout Login Split */
+.split-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+.banner-side { 
+    flex: 1; 
+    background: var(--green-main); 
+    color: white; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    text-align: center; 
+    padding: 20px; 
+}
+
+.form-side { 
+    flex: 1; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    background-color: #ffffff;
+}
+
+.logo-circle { 
+    background: rgba(255,255,255,0.2); 
+    width: 80px; 
+    height: 80px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    margin-bottom: 20px; 
+}
+
+.logo-circle span { font-size: 40px; }
+
+/* Form Login */
+.login-box { width: 100%; max-width: 350px; }
+
+.input-group { margin-bottom: 15px; }
+
+.input-group label { 
+    display: block; 
+    margin-bottom: 5px; 
+    font-weight: bold; 
+    font-size: 14px; 
+}
+
+input { 
+    width: 100%; 
+    padding: 12px; 
+    border: 1px solid #ccc; 
+    border-radius: 8px; 
+    box-sizing: border-box; 
+}
+
+.password-field { position: relative; }
+
+.toggle-eye { 
+    position: absolute; 
+    right: 10px; 
+    top: 10px; 
+    cursor: pointer; 
+    color: #999; 
+}
+
+/* Botão de Login com os efeitos que definimos */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--green-light);
+    color: var(--green-main);
+    border: 2px solid var(--green-main);
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--green-main);
+    color: white;
+    transform: scale(1.02);
+    box-shadow: 0 4px 10px rgba(45, 106, 79, 0.3);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.link-forgot { 
+    display: block; 
+    text-align: center; 
+    margin-top: 20px; 
+    color: var(--green-main); 
+    text-decoration: none; 
+    font-size: 14px; 
+}

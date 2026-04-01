@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Agenda - Horários</title>
+    <link rel="stylesheet" href="horarios.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="main-content">
+        <div class="page-header">
+        <div class="header-left">
+            <a href="dashboard.html" class="btn-back">
+    <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="icon-bg"><i class="fa-regular fa-clock"></i>
+            </div>
+            <div>
+                <h1>Horários</h1>
+            
+            </div>
+        </div>
+    </div>
+
+        <div class="content-container">
+            
+            <div class="calendar-nav">
+                <button class="btn-nav-arrow"><i class="fa-solid fa-chevron-left"></i></button>
+                <span class="current-week">30 de março — 04 de abril, 2026</span>
+                <button class="btn-nav-arrow"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+
+            <div class="days-row">
+                <div class="day-card" onclick="selecionarDia('SEGUNDA', 30)">
+                    <span>SEGUNDA</span>
+                    <strong>30</strong>
+                </div>
+                <div class="day-card" onclick="selecionarDia('TERÇA', 31)">
+                    <span>TERÇA</span>
+                    <strong>31</strong>
+                </div>
+                <div class="day-card active" onclick="selecionarDia('QUARTA', 1)">
+                    <span>QUARTA</span>
+                    <strong>01</strong>
+                </div>
+                <div class="day-card" onclick="selecionarDia('QUINTA', 2)">
+                    <span>QUINTA</span>
+                    <strong>02</strong>
+                    <div class="dot"></div>
+                </div>
+                <div class="day-card" onclick="selecionarDia('SEXTA', 3)">
+                    <span>SEXTA</span>
+                    <strong>03</strong>
+                    <div class="dot"></div>
+                </div>
+                <div class="day-card" onclick="selecionarDia('SÁBADO', 4)">
+                    <span>SÁBADO</span>
+                    <strong>04</strong>
+                    <div class="dot"></div>
+                </div>
+            </div>
+
+            <div class="agenda-section">
+                <h3 id="dia-selecionado-label">QUARTA-FEIRA, 01 DE ABRIL</h3>
+                
+                <div id="lista-agenda" class="agenda-list">
+                    <div class="item-agenda">
+                        <div class="item-time">
+                            <strong>08:00</strong>
+                            <span>09:40</span>
+                        </div>
+                        <div class="item-info">
+                            <span class="badge aula"><i class="fa-solid fa-book-open"></i> Aula</span>
+                            <h4>Matemática - 3º Ano A</h4>
+                            <p>Sala 101</p>
+                        </div>
+                    </div>
+
+                    <div class="item-agenda">
+                        <div class="item-time">
+                            <strong>10:00</strong>
+                            <span>11:00</span>
+                        </div>
+                        <div class="item-info">
+                            <span class="badge reuniao"><i class="fa-solid fa-users"></i> Reunião</span>
+                            <h4>Reunião Pedagógica</h4>
+                            <p>Sala de Reuniões</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="horarios.js"></script>
+</body>
+</html>

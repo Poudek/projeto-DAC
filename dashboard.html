@@ -4,19 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Agenda do Professor</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-light">
     <header class="top-nav">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         <div class="nav-logo">
             <span class="material-symbols-outlined">menu_book</span>
-            <span>Agenda do Professor</span>
+            <span>Agenda Acadêmica</span>
         </div>
         <button class="btn-logout" onclick="logout()">
             <span class="material-symbols-outlined">logout</span> Sair
         </button>
     </header>
+<div class="sidebar">
+    <a href="aulas.html" class="menu-item">
+        <div class="icon-container">
+            <i data-lucide="book-open"></i>
+        </div>
+        <span class="menu-text">Aulas</span>
+    </a>
+
+    <a href="horarios.html" class="menu-item">
+        <div class="icon-container">
+            <i data-lucide="clock"></i>
+        </div>
+        <span class="menu-text">Horários</span>
+    </a>
+
+    <a href="reunioes.html" class="menu-item">
+        <div class="icon-container">
+            <i data-lucide="users"></i>
+        </div>
+        <span class="menu-text">Reuniões</span>
+    </a>
+    
+    <a href="eventos.html" class="menu-item">
+        <div class="icon-container">
+            <i data-lucide="calendar"></i>
+        </div>
+        <span class="menu-text">Eventos</span>
+    </a>
+
+    <hr class="divider">
+
+    <a href="login.html" class="menu-item logout-section">
+        <div class="icon-container">
+            <i data-lucide="log-out"></i>
+        </div>
+        <span class="menu-text">Sair</span>
+    </a>
+</div>
 <img src="./unifametro.jpg" class="dashboard-page" alt="Fundo da página">
     <main class="content">
         <header class="welcome">
@@ -25,32 +65,54 @@
         </header>
 
         <div class="grid-cards">
-            <div class="dash-card">
-                <div class="icon-box"><span class="material-symbols-outlined">menu_book</span></div>
-                <h3>Aulas</h3>
-                <p>Gerencie suas aulas e disciplinas</p>
-                <div class="status-label"><span>12</span> pendentes</div>
-            </div>
-            <div class="dash-card">
-                <div class="icon-box"><span class="material-symbols-outlined">schedule</span></div>
-                <h3>Horários</h3>
-                <p>Visualize e organize seus horários</p>
-                <div class="status-label"><span>6</span> pendentes</div>
-            </div>
-            <div class="dash-card">
-                <div class="icon-box"><span class="material-symbols-outlined">groups</span></div>
-                <h3>Reuniões</h3>
-                <p>Acompanhe reuniões agendadas</p>
-                <div class="status-label"><span>3</span> pendentes</div>
-            </div>
-            <div class="dash-card">
-                <div class="icon-box"><span class="material-symbols-outlined">calendar_month</span></div>
-                <h3>Eventos</h3>
-                <p>Confira eventos acadêmicos</p>
-                <div class="status-label"><span>5</span> pendentes</div>
-            </div>
+    <a href="aulas.html" class="dash-card"> 
+        <div class="icon-box">
+            <span class="material-symbols-outlined">menu_book</span>
         </div>
+        <h3>Aulas</h3>
+        <p>Gerencie suas aulas e disciplinas</p>
+        <div class="status-label">
+            <span id="count-aulas">0</span> cadastradas
+        </div>
+    </a>
+
+    <a href="horarios.html" class="dash-card">
+        <div class="icon-box">
+            <span class="material-symbols-outlined">schedule</span>
+        </div>
+        <h3>Horários</h3>
+        <p>Visualize e organize seus horários</p>
+        <div class="status-label">
+            <span id="count-horarios">0</span> para hoje
+        </div>
+    </a>
+
+    <a href="reunioes.html" class="dash-card">
+        <div class="icon-box">
+            <span class="material-symbols-outlined">groups</span>
+        </div>
+        <h3>Reuniões</h3>
+        <p>Acompanhe reuniões agendadas</p>
+        <div class="status-label">
+            <span id="count-reunioes">0</span> pendentes
+        </div>
+    </a>
+
+    <a href="eventos.html" class="dash-card">
+        <div class="icon-box">
+            <span class="material-symbols-outlined">calendar_month</span>
+        </div>
+        <h3>Eventos</h3>
+        <p>Confira eventos acadêmicos</p>
+        <div class="status-label">
+            <span id="count-eventos">0</span> pendentes
+        </div>
+    </a>
+</div>
     </main>
     <script src="script.js"></script>
+    <script>
+  lucide.createIcons();
+</script>
 </body>
 </html>

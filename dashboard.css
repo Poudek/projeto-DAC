@@ -1,0 +1,174 @@
+/* Variáveis Globais */
+:root {
+    --green-main: #2d6a4f;
+    --green-light: #e8f5e9;
+    --gray-text: #666;
+    --border-color: #eee;
+}
+
+html, body {
+    margin: 20px;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f7f6;
+}
+
+/* Imagem de Fundo Opcional */
+.dashboard-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    opacity: 0.3;
+}
+
+/* Container Principal */
+.main-content {
+    margin-left: 60px; /* Largura da sidebar fechada */
+    width: calc(100% - 60px);
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 60px;
+    height: 100vh;
+    background-color: #2A5941;
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 10px;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    z-index: 1000;
+}
+
+.sidebar:hover {
+    width: 220px;
+}
+
+/* Itens do Menu */
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 15px;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+
+.menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.1); 
+}
+
+.icon-container {
+    width: 45px;
+    min-width: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon-container svg {
+    stroke: #ffffff;
+    width: 28px;
+    height: 28px;
+}
+
+.menu-text {
+    color: white;
+    font-size: 16px;
+    margin-left: 15px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.sidebar:hover .menu-text {
+    opacity: 1;
+}
+
+.divider {
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    margin: 10px 0 25px 0;
+}
+
+.logout-section { margin-top: auto; }
+
+/* Top Nav */
+.top-nav { display: flex; justify-content: space-between; padding: 15px 50px; border-bottom: 1px solid var(--border-color); background: white; }
+.nav-logo { display: flex; align-items: center; gap: 10px; color: var(--green-main); font-weight: bold; }
+.btn-logout { background: none; border: none; display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; }
+
+/* Grid de Conteúdo */
+.content { padding: 40px 50px; }
+
+.grid-cards { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+    gap: 20px; 
+}
+
+/* Cards com Efeitos de Hover */
+/* Remove estilos padrão de link dos cards */
+.dash-card {
+    text-decoration: none; /* Tira o sublinhado */
+    color: inherit;        /* Mantém a cor preta/cinza que você já definiu */
+    display: flex;         /* Mantém o alinhamento interno */
+    flex-direction: column;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.dash-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    background-color: #ffffff; /* Garante que o fundo continue branco */
+    padding: 20px;
+    padding-bottom: 10%;
+    border-radius: 12px;
+}
+
+.icon-box { 
+    background: var(--green-light); 
+    color: var(--green-main); 
+    width: 45px; 
+    height: 45px; 
+    border-radius: 8px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    margin-bottom: 15px; 
+    transition: all 0.3s ease;
+}
+
+.dash-card:hover .icon-box {
+    background-color: var(--green-main);
+    color: white;
+    transform: scale(1.1);
+}
+
+.status-label { color: var(--gray-text); font-size: 14px; margin-top: 15px; }
+.status-label span { 
+    background: var(--green-light); 
+    padding: 2px 8px; 
+    border-radius: 10px; 
+    font-weight: bold; 
+    transition: all 0.3s ease;
+}
+
+.dash-card:hover .status-label span {
+    background-color: var(--green-main);
+    color: white;
+}
+

@@ -3,45 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Agenda do Professor</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <title>Agenda Acadêmica - Organize sua rotina</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="split-container">
-        <section class="banner-side">
-            <div class="logo-circle">
-                <span class="material-symbols-outlined">school</span>
+
+    <header class="navbar">
+        
+        <div class="header-title">
+                <i data-lucide="book-open" class="header-icon"></i>
+                <span>Agenda Acadêmica</span>
             </div>
-            <h1>Agenda do Professor</h1>
-            <p>Gerencie seus horários, aulas, reuniões e eventos em um só lugar.</p>
-        </section>
-        <section class="form-side">
-            <div class="login-box">
-                <h2>Login</h2>
-                <p>Acesse sua conta com matrícula e senha</p>
+        <nav class="nav-links">
+            <a href="login.html" class="btn-login">Entrar</a>
+            <a href="cadastro.html" class="btn-signup">Cadastrar</a>
+        </nav>
+    </header>
 
-                <form id="loginForm">
-                    <div class="input-group">
-                        <label>Matrícula</label>
-                        <input type="text" id="matricula" placeholder="Digite sua matrícula" required>
-                    </div>
+    <section class="hero">
+        <div class="badge">
+            <i class="fa-regular fa-calendar-check"></i> Plataforma para professores e alunos
+        </div>
+        <h1>Organize sua rotina <br> <span class="highlight">acadêmica</span> com simplicidade</h1>
+        <p class="subtitle">
+            Gerencie seus horários, aulas, reuniões e eventos em um só lugar. <br>
+            Tenha controle total da sua agenda de forma prática e eficiente.
+        </p>
+        <div class="hero-btns">
+            <a href="cadastro.html" class="btn-primary">Começar agora <i class="fa-solid fa-chevron-right"></i></a>
+            <a href="login.html" class="btn-secondary">Já tenho conta</a>
+        </div>
+    </section>
 
-                    <div class="input-group">
-                        <label>Senha</label>
-                        <div class="password-field">
-                            <input type="password" id="senha" placeholder="Digite sua senha" required>
-                            <span class="material-symbols-outlined toggle-eye" onclick="togglePassword()">visibility</span>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-primary">Entrar</button>
-                    <a href="#" class="link-forgot">Esqueci minha senha</a>
-                    <a href="#" class="link-forgot">Não possuo conta</a>
-                </form>
+    <section class="features">
+        <h2>Tudo que você precisa</h2>
+        <p>Ferramentas pensadas para facilitar o dia a dia do professor.</p>
+        
+        <div class="card-container">
+            <div class="card">
+                <div class="icon-box"><i class="fa-regular fa-calendar-days"></i></div>
+                <h3>Agenda de Aulas</h3>
+                <p>Organize todas as suas aulas da semana em um calendário visual e intuitivo.</p>
             </div>
-        </section>
-    </div>
-    <script src="script.js"></script>
+            <div class="card">
+                <div class="icon-box"><i class="fa-regular fa-clock"></i></div>
+                <h3>Gestão de Horários</h3>
+                <p>Controle seus horários com facilidade, evitando conflitos e sobreposições.</p>
+            </div>
+            <div class="card">
+                <div class="icon-box"><i class="fa-solid fa-users-gear"></i></div>
+                <h3>Reuniões e Eventos</h3>
+                <p>Cadastre reuniões, conselhos de classe e eventos acadêmicos em um só lugar.</p>
+            </div>
+            <div class="card">
+                <div class="icon-box"><i class="fa-solid fa-book-open"></i></div>
+                <h3>Plano de Ensino</h3>
+                <p>Acompanhe o progresso das suas turmas e mantenha tudo documentado.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="cta-box">
+            <h2>Pronto para organizar sua agenda?</h2>
+            <p>Crie sua conta gratuitamente e comece a gerenciar seus horários hoje mesmo.</p>
+            <a href="cadastro.html" class="btn-cta">Criar minha conta <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Agenda Acadêmica. Todos os direitos reservados.</p>
+    </footer>
+<script src="https://unpkg.com/lucide@latest"></script>
+    <script>lucide.createIcons();</script>
 </body>
 </html>

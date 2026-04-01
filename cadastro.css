@@ -1,0 +1,104 @@
+/* Estilo Base - Fundo Verde Escuro */
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #2d6a4f; /* Tom de verde da imagem */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* O Container de Cadastro Compacto (Voltou ao tamanho original) */
+.cadastro-container {
+    width: 100%;
+    max-width: 450px; /* Largura compacta original */
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); /* Sombra refinada */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza o conteúdo internamente */
+}
+
+/* --- Área do Ícone (Dentro do Container) --- */
+.icon-header {
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* O Círculo translúcido do Ícone */
+.icon-circle {
+    width: 100px;
+    height: 100px;
+    /* Verde mais claro e translúcido, como na imagem */
+    background-color: rgba(61, 139, 97, 0.2); 
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* O Ícone de Capelo */
+.icon-circle img {
+    width: 50px;
+    height: 50px;
+}
+/* ------------------------------------------- */
+
+/* Elementos do Formulário */
+.form-content {
+    width: 100%; /* Ocupa toda a largura do container compacto */
+}
+
+h2 { 
+    color: #2A5941; 
+    margin-bottom: 5px; 
+    margin-top: 0; 
+    text-align: center;
+}
+
+p { 
+    color: #666; 
+    font-size: 14px; 
+    margin-bottom: 30px; 
+    text-align: center;
+}
+
+.input-group { margin-bottom: 20px; display: flex; flex-direction: column; }
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+label { font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #444; }
+
+input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Botão - Usando o verde como cor de ação */
+.btn-cadastrar {
+    width: 100%;
+    padding: 14px;
+    background-color: #3D8B61; /* Verde de ação */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-cadastrar:hover {
+    background-color: #2A5941; /* Escurece no hover */
+}
+
+.footer-links { margin-top: 25px; text-align: center; font-size: 14px; color: #666; }
+.footer-links a { color: #3D8B61; text-decoration: none; font-weight: bold; }

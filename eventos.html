@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Eventos</title>
+    <link rel="icon" type="image/png" href="agenda.png-removebg-preview (1).png">
+    <link rel="stylesheet" href="eventos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-left">
+            <a href="dashboard.html" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Eventos</h1>
+                    <span>Gerencie eventos acadêmicos</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="content-container">
+        <div class="top-bar">
+            <h2>Eventos</h2>
+            <button class="btn-new-event" onclick="openModal()">
+                <i class="fas fa-plus"></i> Novo Evento
+            </button>
+        </div>
+
+        <nav class="filters">
+    <button class="filter-btn active" onclick="filtrar('Todas', this)">Todas</button>
+    <button class="filter-btn" onclick="filtrar('Acadêmico', this)">Acadêmico</button>
+    <button class="filter-btn" onclick="filtrar('Cultural', this)">Cultural</button>
+    <button class="filter-btn" onclick="filtrar('Esportivo', this)">Esportivo</button>
+    <button class="filter-btn" onclick="filtrar('Administrativo', this)">Administrativo</button>
+    <button class="filter-btn" onclick="filtrar('Outro', this)">Outro</button>
+        </nav>
+
+        <section class="events-grid">
+            <article class="event-card" data-category="Acadêmico">
+                <div class="card-header">
+                    <span class="tag academico"><i class="fas fa-tag"></i> Acadêmico</span>
+                    <button class="delete-btn"><i class="far fa-trash-alt"></i></button>
+                </div>
+                <h3 class="event-title">Semana Acadêmica</h3>
+                <div class="event-info">
+                    <p><i class="far fa-calendar"></i> 06/04/2026</p>
+                    <p><i class="far fa-clock"></i> 08:00 - 18:00</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Auditório Principal</p>
+                </div>
+                <hr>
+                <p class="event-description">Palestras e workshops sobre tecnologia na educação.</p>
+            </article>
+
+            <article class="event-card" data-category="Acadêmico">
+                <div class="card-header">
+                    <span class="tag academico"><i class="fas fa-tag"></i> Acadêmico</span>
+                    <button class="delete-btn"><i class="far fa-trash-alt"></i></button>
+                </div>
+                <h3 class="event-title">Feira de Ciências</h3>
+                <div class="event-info">
+                    <p><i class="far fa-calendar"></i> 10/04/2026</p>
+                    <p><i class="far fa-clock"></i> 09:00 - 17:00</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Pátio Central</p>
+                </div>
+                <hr>
+                <p class="event-description">Apresentação de projetos dos alunos.</p>
+            </article>
+
+            <article class="event-card" data-category="Cultural">
+                <div class="card-header">
+                    <span class="tag cultural"><i class="fas fa-tag"></i> Cultural</span>
+                    <button class="delete-btn"><i class="far fa-trash-alt"></i></button>
+                </div>
+                <h3 class="event-title">Festival Cultural</h3>
+                <div class="event-info">
+                    <p><i class="far fa-calendar"></i> 15/04/2026</p>
+                    <p><i class="far fa-clock"></i> 14:00 - 20:00</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Quadra Poliesportiva</p>
+                </div>
+                <hr>
+                <p class="event-description">Exposições de arte e apresentações musicais.</p>
+            </article>
+
+            <article class="event-card" data-category="Esportivo">
+                <div class="card-header">
+                    <span class="tag esportivo"><i class="fas fa-tag"></i> Esportivo</span>
+                    <button class="delete-btn"><i class="far fa-trash-alt"></i></button>
+                </div>
+                <h3 class="event-title">Torneio Interclasses</h3>
+                <div class="event-info">
+                    <p><i class="far fa-calendar"></i> 20/04/2026</p>
+                    <p><i class="far fa-clock"></i> 08:00 - 16:00</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Ginásio</p>
+                </div>
+                <hr>
+                <p class="event-description">Competições esportivas entre as turmas.</p>
+            </article>
+        </section>
+    </main>
+
+    <div class="modal-overlay" id="modalEvento" style="display: none;"> 
+        <div class="modal-container">
+            <div class="modal-header">
+                <div>
+                    <h2>Novo Evento</h2>
+                    <p>Preencha os dados do evento.</p>
+                </div>
+                <button class="btn-close" onclick="closeModal()">&times;</button>
+            </div>
+
+            <form class="modal-form">
+                <div class="form-group">
+                    <label>Título *</label>
+                    <input type="text" placeholder="Ex: Semana Acadêmica" class="input-highlight">
+                </div>
+
+                <div class="form-row" style="gap: 50px;">
+                    <div class="form-group">
+                        <label>Data *</label>
+                        <input type="date">
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria *</label>
+                        <select>
+                            <option value="" disabled selected>Selecione</option>
+                            <option>Acadêmico</option>
+                            <option>Cultural</option>
+                            <option>Esportivo</option>
+                            <option>Administrativo</option>
+                            <option>Outro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row" style="gap: 50px;">
+                    <div class="form-group">
+                        <label>Hora Início *</label>
+                        <input type="time">
+                    </div>
+                    <div class="form-group">
+                        <label>Hora Fim</label>
+                        <input type="time">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Local *</label>
+                    <input type="text" placeholder="Ex: Auditório">
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea rows="2" placeholder="Detalhes do evento..."></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn-save">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="eventos.js"></script>
+</body>
+</html>

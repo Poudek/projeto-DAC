@@ -1,0 +1,451 @@
+:root {
+    --primary-green: #1a7b45;
+    --light-green: #ffffff;
+    --text-dark: #333;
+    --text-gray: #666;
+    --border-color: #e0e0e0; /* Unificado com reuniões */
+    --bg-dashboard: #f8fafc; /* Cor de fundo idêntica */
+    --danger: #ef5350;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    background-color: var(--bg-dashboard);
+    color: var(--text-dark);
+}
+
+/* Header - Ajustado para bater com Reuniões */
+.main-header {
+    background-color: #ffffff;
+    padding: 15px 50px; /* Aumentado de 30px para 50px como em Reuniões */
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Títulos do Header - Correção de Peso e Alinhamento */
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.logo-text h1 {
+    margin: 0;
+    font-size: 1.2rem; /* Aumentado de 1.1 para 1.2 */
+    font-weight: 700;   /* Negrito corrigido para 700 */
+    line-height: 1.2;
+    color: var(--text-dark);
+}
+
+.logo-text span {
+    font-size: 0.8rem; /* Ajustado de 0.85 para 0.8 */
+    color: var(--text-gray);
+    margin: 0;
+}
+
+/* Ícone do Logo */
+.logo-icon {
+    background-color: var(--primary-green);
+    color: white;
+    width: 42px; /* Ajustado para o tamanho correto */
+    height: 42px; /* Ajustado para o tamanho correto */
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+/* Botão de Voltar */
+.btn-back {
+    background: none;
+    text-decoration: none;
+    border: none;
+    color: #1a1a1a;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+    transform: scale(1.2);
+    color: var(--primary-green);
+}
+
+/* Botão Novo Evento - Ajuste de Fonte e Padding */
+.btn-new-event {
+    background-color: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* Ajuste no Título da Página (H2) */
+.top-bar h2 {
+    font-size: 1.8rem;
+    font-weight: 700; /* Garante que o título principal também seja bold */
+    margin: 0;
+    color: var(--text-dark);
+}
+
+.content-container {
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.top-bar h2 {
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.btn-new-event {
+    background-color: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Filtros */
+.filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.filter-btn {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 8px 18px;
+    border-radius: 8px;
+    color: var(--text-gray);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.filter-btn.active {
+    background-color: var(--primary-green);
+    color: white;
+    border-color: var(--primary-green);
+}
+
+.filter-btn:hover:not(.active) {
+    background-color: var(--bg-gray);
+}
+
+/* Grid de Eventos */
+.events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 25px;
+}
+
+.event-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    background-color: white;
+    transition: box-shadow 0.3s;
+}
+
+.event-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.tag {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tag.academico, 
+.tag[class*="acadêmico"], 
+.tag[class*="Acadêmico"] { 
+    background-color: #e3f2fd ; 
+    color: #1976d2 ; 
+}
+.tag.cultural { background-color: #f3e5f5; color: #7b1fa2; }
+.tag.esportivo { background-color: #fff3e0; color: #f57c00; }
+.tag.administrativo, 
+.tag[class*="administrativo"], 
+.tag[class*="Administrativo"] { 
+    background-color: #f1f5f9 ; 
+    color: #475569 ; 
+    border: 1px solid #e2e8f0;
+}
+.tag.outro, 
+.tag[class*="outro"] { 
+    background-color: #f5f5f5 ; 
+    color: #616161 ; 
+}
+.delete-btn {
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 1rem;
+    opacity: 0.7;
+}
+
+.delete-btn:hover { opacity: 1; }
+
+.event-title {
+    margin: 0 0 15px 0;
+    font-size: 1.3rem;
+    color: #222;
+}
+
+.event-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.event-info p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-gray);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.event-info i {
+    width: 16px;
+    color: #999;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 15px 0;
+}
+
+.event-description {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+}
+
+/* Ajuste para inputs de data, hora e select ficarem iguais aos de texto */
+input[type="date"], 
+input[type="time"], 
+.custom-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    outline: none;
+    background-color: #fff;
+    color: var(--text-dark);
+}
+
+/* Destaque para o campo de Título (conforme a imagem) */
+.input-highlight {
+    border: 2px solid var(--primary-green) !important;
+}
+
+/* Estilo do dropdown (Select) */
+.custom-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C2.185 5.355 2.403 5 2.808 5h9.384c.405 0 .623.355.357.658l-4.796 5.482a.5.5 0 0 1-.748 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+}
+
+/* Espaçamento das linhas duplas */
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+/* --- MODAL BLINDADO --- */
+.modal-overlay {
+    position: fixed; /* Essencial para sobrepor a tela toda */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); 
+    display: none; /* O JS vai mudar para flex */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Fica na frente de tudo */
+}
+
+.modal-container {
+    background-color: #fff;
+    padding: 32px; /* Mais respiro interno */
+    border-radius: 20px; /* Bordas mais suaves */
+    width: 90%;
+    max-width: 550px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12); /* Sombra mais profunda e suave */
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.modal-header p {
+    color: var(--primary-green);
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+}
+
+/* Formulário Interno */
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+/* Inputs e Selects */
+.modal-form input, 
+.modal-form select, 
+.modal-form textarea {
+    background-color: #fcfcfc; /* Fundo levemente cinza para destacar o branco do modal */
+    border: 1px solid #e2e8f0;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+.modal-form input:focus, 
+.modal-form select:focus, 
+.modal-form textarea:focus {
+    background-color: #fff;
+    border-color: var(--primary-green);
+    
+}
+
+/* A borda verde de destaque que você queria */
+.input-highlight {
+    border: 2px solid var(--primary-green) !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+/* Botões do Rodapé */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+.btn-cancel:hover {
+    background-color: #f8fafc;
+    color: #334155;
+}
+
+.btn-save {
+    background-color: #1a7b45;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-save:hover {
+    filter: brightness(0.9);
+}

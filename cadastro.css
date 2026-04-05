@@ -1,104 +1,146 @@
-/* Estilo Base - Fundo Verde Escuro */
-body {
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background-color: #2d6a4f; /* Tom de verde da imagem */
+/* Variáveis Globais (Necessárias para as cores) */
+:root {
+    --green-main: #2d6a4f;
+    --green-light: #e8f5e9;
+    --gray-text: #666;
+    --border-color: #eee;
+}
+
+body { 
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+    margin: 0; 
+    padding: 0; 
+    overflow: hidden; /* Evita scrolls desnecessários no login */
+}
+
+/* Layout Login Split */
+.split-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
     height: 100vh;
-    margin: 0;
+    width: 100vw;
 }
 
-/* O Container de Cadastro Compacto (Voltou ao tamanho original) */
-.cadastro-container {
-    width: 100%;
-    max-width: 450px; /* Largura compacta original */
-    background: white;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); /* Sombra refinada */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centraliza o conteúdo internamente */
+.banner-side { 
+    flex: 1; 
+    background: var(--green-main); 
+    color: white; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    text-align: center; 
+    padding: 20px; 
 }
 
-/* --- Área do Ícone (Dentro do Container) --- */
-.icon-header {
-    margin-bottom: 25px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.form-side { 
+    flex: 1; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    background-color: #ffffff;
 }
 
-/* O Círculo translúcido do Ícone */
-.icon-circle {
-    width: 100px;
-    height: 100px;
-    /* Verde mais claro e translúcido, como na imagem */
-    background-color: rgba(61, 139, 97, 0.2); 
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.login-box h2 {
+    margin-bottom: 5px; /* Reduz o espaço abaixo do título */
 }
 
-/* O Ícone de Capelo */
-.icon-circle img {
-    width: 50px;
-    height: 50px;
-}
-/* ------------------------------------------- */
-
-/* Elementos do Formulário */
-.form-content {
-    width: 100%; /* Ocupa toda a largura do container compacto */
+.login-box p {
+    margin-top: -4px;      /* Remove o espaço acima do parágrafo */
+    margin-bottom: 20px; /* Mantém um respiro em relação ao formulário */
+    color: #666;        /* Opcional: uma cor mais suave para o subtítulo */
 }
 
-h2 { 
-    color: #2A5941; 
+.logo-circle { 
+    background: rgba(255,255,255,0.2); 
+    width: 80px; 
+    height: 80px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    margin-bottom: 20px; 
+}
+
+.logo-circle span { font-size: 40px; }
+
+/* Form Login */
+.login-box { width: 100%; max-width: 350px; }
+
+.input-group { margin-bottom: 15px; }
+
+.input-group label { 
+    display: block; 
     margin-bottom: 5px; 
-    margin-top: 0; 
-    text-align: center;
-}
-
-p { 
-    color: #666; 
+    font-weight: bold; 
     font-size: 14px; 
-    margin-bottom: 30px; 
-    text-align: center;
+}
+.input-row {
+    display: flex;
+    gap: 15px; /* Espaço entre os dois campos */
+    width: 100%;
 }
 
-.input-group { margin-bottom: 20px; display: flex; flex-direction: column; }
-.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
-label { font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #444; }
-
-input {
-    padding: 12px;
+.input-row .input-group {
+    flex: 1; /* Faz com que ambos ocupem o mesmo espaço */
+}
+select {
+    width: 100%;
+    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 16px;
-    color: #333;
+    border-radius: 8px;
+    background-color: white;
+    height: 42px; /* Ajuste conforme a altura dos seus inputs */
 }
 
-/* Botão - Usando o verde como cor de ação */
-.btn-cadastrar {
+input { 
+    width: 100%; 
+    padding: 12px; 
+    border: 1px solid #ccc; 
+    border-radius: 8px; 
+    box-sizing: border-box; 
+}
+
+.password-field { position: relative; }
+
+.toggle-eye { 
+    position: absolute; 
+    right: 10px; 
+    top: 10px; 
+    cursor: pointer; 
+    color: #999; 
+}
+
+/* Botão de Login com os efeitos que definimos */
+.btn-primary {
     width: 100%;
     padding: 14px;
-    background-color: #3D8B61; /* Verde de ação */
-    color: white;
-    border: none;
-    border-radius: 6px;
+    background-color: var(--green-light);
+    color: var(--green-main);
+    border: 2px solid var(--green-main);
+    border-radius: 8px;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 1rem;
     cursor: pointer;
-    transition: background 0.3s ease;
     margin-top: 10px;
+    transition: all 0.3s ease;
 }
 
-.btn-cadastrar:hover {
-    background-color: #2A5941; /* Escurece no hover */
+.btn-primary:hover {
+    background-color: var(--green-main);
+    color: white;
+    transform: scale(1.02);
+    box-shadow: 0 4px 10px rgba(45, 106, 79, 0.3);
 }
 
-.footer-links { margin-top: 25px; text-align: center; font-size: 14px; color: #666; }
-.footer-links a { color: #3D8B61; text-decoration: none; font-weight: bold; }
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.link-forgot { 
+    display: block; 
+    text-align: center; 
+    margin-top: 20px; 
+    color: var(--green-main); 
+    text-decoration: none; 
+    font-size: 14px; 
+}

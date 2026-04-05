@@ -1,45 +1,92 @@
 :root {
-    --green-dark: #2d7a50;
+    --green-dark: #2d7a4d;
     --green-light: #e9f5ee;
-    --text-gray: #718096;
+    --text-dark: #1a1a1a;
+    --text-gray: #666;
     --border-color: #e2e8f0;
+    --bg-dashboard: #f8fafc;
+    /* Cor para Eventos */
+    --event-purple: #7b1fa2;
+    --event-purple-light: #f3e5f5;
 }
 
-body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; margin: 0; }
+body { 
+    background-color: var(--bg-dashboard); 
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+    margin: 0; 
+}
 
-.content-container { padding: 0 50px; }
+/* --- HEADER PRINCIPAL --- */
+.main-header {
+    background-color: #ffffff;
+    padding: 15px 3%; 
+    border-bottom: 1px solid var(--border-color);
+}
 
-/* Cabeçalho */
-.page-header { padding: 20px 50px; display: flex; align-items: center; }
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
 
-.header-left { display: flex; align-items: center; gap: 20px; }
-/* Header */
-.header-left { position:absolute; top: 0; left: 0; align-items: center; gap: 15px; padding: 20px 40px; }
-.icon-bg { background: var(--green-dark); color: white; padding: 12px; border-radius: 10px; font-size: 1.2rem; }
-.header-left h1 { font-size: 1.5rem; margin: 0; }
-.header-left p { color: var(--text-gray); font-size: 0.9rem; }
-.icon-bg.green {
-    background: var(--green-dark);
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.icon-box {
+    background-color: var(--green-dark);
     color: white;
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
 }
+
+.text-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.text-group h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1.2;
+    margin: 0;
+}
+
+.text-group p {
+    font-size: 0.85rem;
+    color: var(--text-gray);
+    margin: 0;
+}
+
 .btn-back {
-    text-decoration: none; /* Remove o sublinhado */
-    color: #000;           /* Mantém a cor preta (ou a cor que preferir) */
-    font-size: 1.2rem;     /* Ajusta o tamanho se necessário */
-    cursor: pointer;
-    transition: transform 0.2s;
+    text-decoration: none;
+    color: var(--text-dark);
+    font-size: 1.1rem;
+    transition: transform 0.2s, color 0.2s;
     display: inline-block;
 }
 
 .btn-back:hover {
-    transform: scale(1.2); /* Dá um leve aumento ao passar o mouse */
-    color: var(--green-dark); /* Opcional: muda para verde no hover */
+    transform: scale(1.2);
+    color: var(--green-dark);
 }
 
-/* Navegação da Semana (Setas e Data) */
+/* --- CONTEÚDO E NAVEGAÇÃO --- */
+.content-container { 
+    padding: 30px 5%; 
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
 .calendar-nav {
     display: flex;
     align-items: center;
@@ -55,17 +102,20 @@ body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; margin: 0
     border-radius: 8px;
     cursor: pointer;
     color: var(--text-gray);
+    transition: 0.2s;
 }
+
+.btn-nav-arrow:hover { background-color: #f1f5f9; }
 
 .days-row {
     display: flex;
-    justify-content: space-between; /* Espaçamento igual entre eles */
+    justify-content: space-between;
     gap: 15px;
     margin-bottom: 40px;
 }
 
 .day-card {
-    flex: 1; /* Faz todos terem o mesmo tamanho */
+    flex: 1;
     background: white;
     border: 1px solid var(--border-color);
     border-radius: 12px;
@@ -78,7 +128,6 @@ body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; margin: 0
 .day-card span { font-size: 0.75rem; color: var(--text-gray); font-weight: bold; }
 .day-card strong { font-size: 1.5rem; display: block; margin-top: 5px; }
 
-/* Dia Ativo (Verde) */
 .day-card.active {
     background: var(--green-dark);
     color: white;
@@ -87,7 +136,6 @@ body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; margin: 0
 
 .day-card.active span { color: rgba(255,255,255,0.8); }
 
-/* Pontinho verde nos outros dias */
 .dot {
     width: 6px;
     height: 6px;
@@ -96,6 +144,7 @@ body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; margin: 0
     margin: 8px auto 0;
 }
 
+/* --- AGENDA --- */
 .agenda-section h3 {
     text-transform: uppercase;
     font-size: 0.9rem;
@@ -108,35 +157,43 @@ body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; margin: 0
     background: white;
     border: 1px solid var(--border-color);
     border-radius: 15px;
-    display: flex; /* Alinha Horário e Info lado a lado */
+    display: flex;
     margin-bottom: 15px;
     overflow: hidden;
     transition: 0.2s;
 }
 
-.item-agenda:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+.item-agenda:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+}
 
-/* Coluna do Horário */
 .item-time {
     padding: 20px;
-    min-width: 90px;
+    min-width: 100px;
     text-align: center;
-    border-right: 1px solid #f1f5f9; /* A linha divisória vertical */
+    border-right: 1px solid #f1f5f9;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
 }
 
 .item-time strong { font-size: 1.1rem; color: #334155; }
 .item-time span { font-size: 0.85rem; color: #94a3b8; }
 
-/* Conteúdo da Matéria */
-.item-info { padding: 20px; flex: 1; }
+/* Ícone de Evento na lateral */
+.icon-evento {
+    color: var(--event-purple);
+    font-size: 1.1rem;
+    margin-top: 8px;
+}
 
+.item-info { padding: 20px; flex: 1; }
 .item-info h4 { margin: 5px 0; font-size: 1.1rem; color: #1e293b; }
 .item-info p { margin: 0; font-size: 0.9rem; color: #64748b; }
 
-/* Badges */
+/* --- BADGES (Aulas, Reuniões, Eventos) --- */
 .badge {
     display: inline-flex;
     align-items: center;
@@ -145,7 +202,15 @@ body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; margin: 0
     border-radius: 8px;
     font-size: 0.75rem;
     font-weight: bold;
+    margin-bottom: 5px;
 }
 
 .badge.aula { background: var(--green-light); color: var(--green-dark); }
 .badge.reuniao { background: #fff7ed; color: #ea580c; }
+
+/* Estilo para a badge de Eventos */
+.badge.evento {
+    background-color: var(--event-purple-light);
+    color: var(--event-purple);
+    border: 1px solid #e1bee7;
+}

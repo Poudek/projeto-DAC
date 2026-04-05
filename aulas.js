@@ -156,3 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     preencherHorarios();
     renderizarTabela();
 });
+document.addEventListener('DOMContentLoaded', () => {
+    // Isso garante que, ao entrar na tela, a visão de professor seja carregada
+    alternarVisao('professor'); 
+});

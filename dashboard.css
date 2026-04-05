@@ -158,7 +158,13 @@ html, body {
     transform: scale(1.1);
 }
 
-.status-label { color: var(--gray-text); font-size: 14px; margin-top: 15px; }
+.status-label {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--text-gray);
+}
+
+
 .status-label span { 
     background: var(--green-light); 
     padding: 2px 8px; 

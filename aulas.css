@@ -14,11 +14,57 @@ body {
     
 
 /* Header */
-.header-left { display: flex; align-items: center; gap: 15px; padding: 20px 40px; }
-.icon-bg { background: var(--green-dark); color: white; padding: 12px; border-radius: 10px; font-size: 1.2rem; }
-.header-left h1 { font-size: 1.5rem; margin: 0; }
-.header-left p { color: var(--text-gray); font-size: 0.9rem; }
+.main-header {
+    background-color: #ffffff;
+    padding: 15px 40px; /* Alinhado com o padding do content-container */
+    border-bottom: 1px solid #e2e8f0; /* Linha divisória clara */
+    margin-bottom: 20px;
+}
 
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Caixa Verde padrão que você definiu */
+.icon-box {
+    background-color: var(--green-dark);
+    color: white;
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.text-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.text-group h1 {
+    font-size: 1.2rem; /* Tamanho padronizado */
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.1;
+    margin: 0;
+}
+
+.text-group p {
+    font-size: 0.8rem;
+    color: var(--text-gray);
+    margin: 0;
+}
 /* Toggle Professor/Aluno */
 .toggle-user { background: #edf2f7; display: flex; padding: 5px; border-radius: 10px; margin-bottom: 25px; }
 .toggle-user button {
@@ -71,12 +117,12 @@ body {
 
 
 .btn-back {
-    text-decoration: none; /* Remove o sublinhado */
-    color: #000;           /* Mantém a cor preta (ou a cor que preferir) */
-    font-size: 1.2rem;     /* Ajusta o tamanho se necessário */
-    cursor: pointer;
+    text-decoration: none;
+    color: #1a1a1a;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
     transition: transform 0.2s;
-    display: inline-block;
 }
 
 .btn-back:hover {
@@ -117,7 +163,8 @@ body {
 }
 
 .modal-header h2 { color: #333; margin-bottom: 5px; }
-.modal-header p { color: #888; font-size: 0.9rem; margin-bottom: 25px; }
+.modal-header p { color: #2d7a50; font-size: 0.9rem; margin-bottom: 25px; }
+
 
 .close-modal {
     position: absolute; /* MUDE PARA ABSOLUTE */
@@ -180,4 +227,15 @@ body {
 /* Botões do Rodapé */
 .modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
 .btn-cancelar { background: #eee; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; }
-.btn-salvar { background: #2d7a50; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+.btn-salvar { 
+    background: #1a7b45; 
+    color: white; 
+    border: none; 
+    padding: 10px 30px; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-weight: 600; 
+}
+.btn-salvar:hover {
+    filter: brightness(0.9);
+}

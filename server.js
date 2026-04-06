@@ -6,78 +6,78 @@ const cors = require('cors');
 const app = express();
 
 // Middlewares
-app.use(cors()); // Libera o acesso para o seu Front-end (porta 5500)
-app.use(express.json()); // Permite que o servidor entenda JSON
+app.use(cors()); 
+app.use(express.json()); 
 
-// Configuração da conexão com o MySQL (Railway)
-const db = mysql.createConnection({
+/* ============================================================
+   CONFIGURAÇÃO DO POOL (Essencial para Produção)
+   ============================================================ */
+// O Pool gerencia várias conexões automaticamente e as reabre se caírem.
+const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    port: process.env.DB_PORT
+    port: process.env.DB_PORT || 3306,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-// Teste de conexão com o Banco
-db.connect((err) => {
+// Teste de conexão inicial
+db.getConnection((err, connection) => {
     if (err) {
-        console.error('❌ Erro ao conectar ao MySQL no Railway:', err.message);
-        return;
+        console.error('❌ Erro crítico ao conectar ao MySQL no Railway:', err.message);
+    } else {
+        console.log('✅ Pool de conexões estabelecido com sucesso!');
+        connection.release(); // Libera a conexão de teste de volta para o pool
     }
-    console.log('✅ Conectado com sucesso ao MySQL no Railway!');
 });
 
 /* ============================================================
-   ROTA DE CADASTRO (Onde o seu formulário vai bater)
+   ROTAS
    ============================================================ */
+
 app.post('/cadastro', (req, res) => {
     const { nome, email, matricula, senha, tipo_id } = req.body;
+    console.log(`--- Tentativa de cadastro: ${nome} (${matricula}) ---`);
 
-    // Log para o seu acompanhamento de QA
-    console.log(`--- Nova tentativa de cadastro: ${nome} (Matrícula: ${matricula}) ---`);
-
+    // Nota de QA: Verifique se a tabela no Railway é exatamente 'tbUsuarios' (Case Sensitive)
     const sql = "INSERT INTO tbUsuarios (nome, email, matricula, senha, tipo_id) VALUES (?, ?, ?, ?, ?)";
     
     db.query(sql, [nome, email, matricula, senha, tipo_id], (err, result) => {
         if (err) {
-            console.error('❌ Erro ao inserir no banco:', err.sqlMessage);
-            return res.status(500).json({ error: err.sqlMessage });
+            console.error('❌ Erro no INSERT:', err.message);
+            return res.status(500).json({ error: "Erro ao cadastrar no banco" });
         }
-        console.log('✅ Usuário cadastrado com sucesso no Banco!');
         res.status(201).json({ message: "Usuário cadastrado!", id: result.insertId });
     });
 });
-/* ============================================================
-   ROTA DE LOGIN (Busca no Banco)
-   ============================================================ */
+
 app.post('/login', (req, res) => {
     const { matricula, senha } = req.body;
-
     console.log(`--- Tentativa de Login: Matrícula ${matricula} ---`);
 
     const sql = "SELECT * FROM tbUsuarios WHERE matricula = ? AND senha = ?";
     
     db.query(sql, [matricula, senha], (err, results) => {
         if (err) {
-            console.error('❌ Erro na consulta de login:', err);
-            return res.status(500).json({ error: "Erro no servidor" });
+            console.error('❌ Erro no SELECT:', err.message);
+            return res.status(500).json({ error: "Erro interno no servidor" });
         }
 
         if (results.length > 0) {
-            // Se encontrou o usuário
             console.log('✅ Login autorizado!');
             res.status(200).json({ message: "Sucesso", user: results[0] });
         } else {
-            // Se não encontrou (senha errada ou matrícula inexistente)
-            console.log('⚠️ Login negado: Credenciais inválidas.');
+            console.log('⚠️ Login negado.');
             res.status(401).json({ error: "Matrícula ou senha incorretos" });
         }
     });
 });
 
-// Inicialização do Servidor
+// Inicialização
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando na porta ${PORT}`);
-    console.log(`📍 Endpoint de cadastro: http://localhost:${PORT}/cadastro`);
 });

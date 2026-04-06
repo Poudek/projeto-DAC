@@ -39,7 +39,7 @@ if (loginForm) {
         const senha = document.getElementById('senha').value;
 
         try {
-            const response = await fetch('${API_URL}/login', {
+            const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ matricula, senha })
@@ -91,7 +91,7 @@ if (cadastroForm) {
         const tipo_id = (tipoConta === 'professor') ? 1 : 3;
 
         try {
-            const response = await fetch('${API_URL}/cadastro', {
+            const response = await fetch(`${API_URL}/cadastro`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nome, email, matricula, senha, tipo_id })

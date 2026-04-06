@@ -1,4 +1,4 @@
-const API_URL = "projeto-dac-production.up.railway.app"; // URL do seu back-end no Railway
+const API_URL = "https://projeto-dac-production.up.railway.app"; // URL do seu back-end no Railway
 
 /* ============================================================
    CONFIGURAÇÕES GERAIS E UTILITÁRIOS

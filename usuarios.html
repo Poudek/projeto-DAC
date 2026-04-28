@@ -47,15 +47,15 @@
                     Coordenadores
                 </button>
                 <button id="btn-view-suportes" onclick="filtrarUsuarios('suportes')">
-                    Suportes
+                    Secretaria
                 </button>
                 <button id="btn-view-alunos" onclick="filtrarUsuarios('alunos')">
                     Alunos
                 </button>
             </div>
 
-            <button class="btn-novo-user" id="btnAbrirModalUsuario" style="background-color: #2d7a50;">
-                <i class="fa-solid fa-user-plus"></i> Novo Usuário
+            <button class="btn-novo-user" onclick="abrirModalNovoUsuario()">
+    <i class="fa-solid fa-user-plus"></i> Novo Usuário
             </button>
         </div>
 
@@ -70,10 +70,7 @@
                         <th style="text-align: right;">Ações</th>
                     </tr>
                 </thead>
-                <tbody id="lista-usuarios">
-                    <!-- Exemplo de linha que virá do banco -->
-                    
-                </tbody>
+                <tbody id="lista-usuarios"></tbody>
             </table>
         </div>
     </main>
@@ -90,46 +87,54 @@
             <span class="close-modal" id="fecharModal">&times;</span>
         </div>
         
-        <form id="formUsuario">
-            <div class="input-group">
-                <label>Nome Completo *</label>
-                <input type="text" id="nomeUsuario" placeholder="Ex: Maria Oliveira" required>
-            </div>
+        <!-- Dentro do seu modalUsuario -->
+<form id="formUsuario">
+    <div class="input-group">
+        <label>Nome Completo *</label>
+        <input type="text" id="nomeUsuario" placeholder="Ex: Maria Oliveira" required>
+    </div>
 
-            <div class="input-row">
-                <div class="input-group" style="flex: 2;">
-                    <label>E-mail Acadêmico *</label>
-                    <input type="email" id="emailUsuario" placeholder="exemplo@unifametro.edu.br" required>
-                </div>
-                <div class="input-group">
-                    <label>Cargo *</label>
-                    <select id="cargoUsuario" required>
-                        <option value="">Selecione...</option>
-                        <option value="Professor">Professor</option>
-                        <option value="Coordenador">Coordenador</option>
-                        <option value="Administrador">Administrador</option>
-                        <option value="Suporte">Suporte</option>
-                        <option value="Aluno">Aluno</option>
-                    </select>
-                </div>
-            </div>
+    <div class="input-row">
+        <div class="input-group" style="flex: 2;">
+            <label>E-mail Acadêmico *</label>
+            <input type="email" id="emailUsuario" placeholder="exemplo@unifametro.edu.br" required>
+        </div>
+        <div class="input-group">
+            <label>Cargo *</label>
+            <select id="cargoUsuario" required>
+                <option value="">Selecione...</option>
+                <option value="1">Professor</option>
+                <option value="2">Coordenador</option>
+                <option value="3">Aluno</option>
+                <option value="4">Secretaria</option> <!-- Ajustado conforme sua tabela -->
+                <option value="5">Administrador</option>
+            </select>
+        </div>
+    </div>
 
-            <div class="input-row">
-                <div class="input-group">
-                    <label>Senha Provisória *</label>
-                    <input type="password" id="senhaUsuario" placeholder="********" required>
-                </div>
-                <div class="input-group">
-                    <label>Setor *</label>
-                    <input type="text" id="setorUsuario" placeholder="Ex: TI / Coordenação">
-                </div>
-            </div>
+    <div class="input-row">
+        <div class="input-group" style="position: relative;">
+    <label>Senha Provisória *</label>
+    <div style="position: relative; display: flex; align-items: center;">
+        <input type="password" id="senhaUsuario" placeholder="********" required style="width: 100%; padding-right: 40px;">
+        <i class="fa-solid fa-eye" id="toggleSenha" style="position: absolute; right: 15px; cursor: pointer; color: #718096;"></i>
+    </div>
+    <!-- No seu usuarios.html, dentro do grupo da senha -->
+<small style="color: #718096; font-size: 0.75rem; display: block; margin-top: 4px;">
+    Mínimo 8 caracteres, 1 maiúscula e 1 especial.
+</small>
+</div>
+        <div class="input-group">
+            <label>Matrícula *</label> <!-- Usei matrícula aqui pois seu backend pede este campo -->
+            <input type="text" id="matriculaUsuario" placeholder="Ex: 20231010" required>
+        </div>
+    </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel" id="btnCancelarUser">Cancelar</button>
-                <button type="submit" class="btn-save">Salvar Usuário</button>
-            </div>
-        </form>
+    <div class="modal-footer">
+        <button type="button" class="btn-cancel" id="btnCancelarUser">Cancelar</button>
+        <button type="submit" class="btn-save">Salvar Usuário</button>
+    </div>
+</form>
     </div>
 </div>
 
@@ -137,18 +142,14 @@
 <script>
     lucide.createIcons();
 
-    // Lógica Simples para abrir/fechar modal (baseada na sua tela de aulas)
-    const modal = document.getElementById("modalUsuario");
-    const btn = document.getElementById("btnAbrirModalUsuario");
-    const span = document.getElementById("fecharModal");
-    const btnCancel = document.getElementById("btnCancelarUser");
-
-    btn.onclick = () => modal.style.display = "block";
-    span.onclick = () => modal.style.display = "none";
-    btnCancel.onclick = () => modal.style.display = "none";
-
+    // REMOVIDA A LÓGICA ANTIGA QUE ESTAVA AQUI PARA NÃO DAR CONFLITO
+    // O controle agora é feito 100% pelo usuarios.js através das funções globais
+    
+    // Apenas o fechar no (X) e clicar fora:
+    document.getElementById("fecharModal").onclick = () => fecharLimparModal();
     window.onclick = (event) => {
-        if (event.target == modal) modal.style.display = "none";
+        const modal = document.getElementById("modalUsuario");
+        if (event.target == modal) fecharLimparModal();
     }
 </script>
 <script src="usuarios.js"></script>

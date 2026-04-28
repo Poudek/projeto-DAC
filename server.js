@@ -5,14 +5,14 @@ const cors = require('cors');
 
 const app = express();
 
-// Middlewares
-app.use(cors()); 
+// --- MIDDLEWARES ---
+// Mantenha o cors no topo para evitar bloqueios do navegador
+app.use(cors({ origin: '*' })); 
 app.use(express.json()); 
 
 /* ============================================================
-   CONFIGURAÇÃO DO POOL (Essencial para Produção)
+   CONFIGURAÇÃO DO POOL
    ============================================================ */
-// O Pool gerencia várias conexões automaticamente e as reabre se caírem.
 const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -24,13 +24,12 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
-// Teste de conexão inicial
 db.getConnection((err, connection) => {
     if (err) {
-        console.error('❌ Erro crítico ao conectar ao MySQL no Railway:', err.message);
+        console.error('❌ Erro crítico ao conectar ao MySQL:', err.message);
     } else {
         console.log('✅ Pool de conexões estabelecido com sucesso!');
-        connection.release(); // Libera a conexão de teste de volta para o pool
+        connection.release();
     }
 });
 
@@ -38,11 +37,9 @@ db.getConnection((err, connection) => {
    ROTAS
    ============================================================ */
 
+// --- CADASTRAR ---
 app.post('/cadastro', (req, res) => {
     const { nome, email, matricula, senha, tipo_id } = req.body;
-    console.log(`--- Tentativa de cadastro: ${nome} (${matricula}) ---`);
-
-    // Nota de QA: Verifique se a tabela no Railway é exatamente 'tbUsuarios' (Case Sensitive)
     const sql = "INSERT INTO tbUsuarios (nome, email, matricula, senha, tipo_id) VALUES (?, ?, ?, ?, ?)";
     
     db.query(sql, [nome, email, matricula, senha, tipo_id], (err, result) => {
@@ -54,53 +51,108 @@ app.post('/cadastro', (req, res) => {
     });
 });
 
-app.post('/login', (req, res) => {
-    const { matricula, senha } = req.body;
-    console.log(`--- Tentativa de Login: Matrícula ${matricula} ---`);
-
-    const sql = "SELECT * FROM tbUsuarios WHERE matricula = ? AND senha = ?";
-    
-    db.query(sql, [matricula, senha], (err, results) => {
-        if (err) {
-            console.error('❌ Erro no SELECT:', err.message);
-            return res.status(500).json({ error: "Erro interno no servidor" });
-        }
-
-        if (results.length > 0) {
-            console.log('✅ Login autorizado!');
-            res.status(200).json({ message: "Sucesso", user: results[0] });
-        } else {
-            console.log('⚠️ Login negado.');
-            res.status(401).json({ error: "Matrícula ou senha incorretos" });
-        }
-    });
-});
-
-// Inicialização
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando na porta ${PORT}`);
-});
-
+// --- LISTAR TODOS ---
 app.get('/api/usuarios', (req, res) => {
-    // Ajustado para 'tbUsuarios' conforme usado no restante do código
+    console.log("📢 Requisição recebida em /api/usuarios");
     const query = `
-        SELECT 
-            u.id, 
-            u.nome, 
-            u.email, 
-            t.descricao AS cargo 
+        SELECT u.id, u.nome, u.email, t.descricao AS cargo 
         FROM tbUsuarios u
         INNER JOIN tbPessoaTipo t ON u.tipo_id = t.id
         ORDER BY u.nome ASC`;
 
     db.query(query, (err, results) => {
         if (err) {
-            console.error("❌ Erro no SQL ao buscar usuários:", err.message);
-            return res.status(500).json({ error: "Erro ao buscar dados no banco" });
+            console.error("❌ Erro SQL:", err.message);
+            return res.status(500).json({ error: err.message });
         }
-        
-        console.log(`✅ ${results.length} usuários encontrados.`);
         res.json(results); 
     });
+});
+
+// --- EXCLUIR (A ROTA QUE FALTA) ---
+app.delete('/api/usuarios/:id', (req, res) => {
+    const { id } = req.params;
+    console.log(`--- 🗑️ Tentativa de exclusão: ID ${id} ---`);
+
+    const sql = "DELETE FROM tbUsuarios WHERE id = ?";
+
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error('❌ Erro no DELETE:', err.message);
+            return res.status(500).json({ error: "Erro ao excluir usuário" });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "Usuário não encontrado" });
+        }
+
+        console.log('✅ Usuário removido com sucesso!');
+        res.status(200).json({ message: "Sucesso" });
+    });
+});
+
+// --- LOGIN ---
+app.post('/login', (req, res) => {
+    const { matricula, senha } = req.body;
+    const sql = "SELECT * FROM tbUsuarios WHERE matricula = ? AND senha = ?";
+    
+    db.query(sql, [matricula, senha], (err, results) => {
+        if (err) {
+            console.error('❌ Erro no SELECT:', err.message);
+            return res.status(500).json({ error: "Erro interno" });
+        }
+
+        if (results.length > 0) {
+            res.status(200).json({ message: "Sucesso", user: results[0] });
+        } else {
+            res.status(401).json({ error: "Credenciais incorretas" });
+        }
+    });
+});
+
+// --- ATUALIZAR USUÁRIO ---
+app.put('/api/usuarios/:id', (req, res) => {
+    const { id } = req.params;
+    const { nome, email, matricula, tipo_id } = req.body;
+    
+    console.log(`--- 📝 Tentativa de atualização: ID ${id} ---`);
+
+    const sql = `
+        UPDATE tbUsuarios 
+        SET nome = ?, email = ?, matricula = ?, tipo_id = ? 
+        WHERE id = ?`;
+
+    db.query(sql, [nome, email, matricula, tipo_id, id], (err, result) => {
+        if (err) {
+            console.error('❌ Erro no UPDATE:', err.message);
+            return res.status(500).json({ error: "Erro ao atualizar usuário no banco" });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "Usuário não encontrado" });
+        }
+
+        console.log('✅ Usuário atualizado com sucesso!');
+        res.status(200).json({ message: "Sucesso" });
+    });
+});
+
+// --- BUSCAR UM USUÁRIO PELO ID ---
+app.get('/api/usuarios/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = "SELECT id, nome, email, matricula, senha, tipo_id FROM tbUsuarios WHERE id = ?";
+    
+    db.query(sql, [id], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (result.length === 0) return res.status(404).json({ error: "Usuário não encontrado" });
+        res.json(result[0]);
+    });
+});
+
+/* ============================================================
+   INICIALIZAÇÃO
+   ============================================================ */
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });

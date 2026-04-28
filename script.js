@@ -1,16 +1,55 @@
-const API_URL = "https://projeto-dac-production.up.railway.app"; // URL do seu back-end no Railway
+const API_URL = "https://projeto-dac-production.up.railway.app"; 
 
 /* ============================================================
-   CONFIGURAÇÕES GERAIS E UTILITÁRIOS
+   UTILITÁRIOS DE VALIDAÇÃO (Regras Atualizadas)
    ============================================================ */
 
-// Função para mostrar/esconder senha (compartilhada entre Login e Cadastro)
+function validarDados(email, senha, matricula, isCadastro = true) {
+    // 1. Validar Matrícula (Padrão 0-0000000000)
+    const matriculaRegex = /^\d-\d{10}$/;
+    if (!matriculaRegex.test(matricula)) {
+        alert("Formato de matrícula inválido! Use o padrão: 0-0000000000");
+        return false;
+    }
+
+    // 2. Validar Senha (Maiúscula, Número, Caractere Especial, min 8 caracteres)
+    const senhaRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!senhaRegex.test(senha)) {
+        alert("A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, um número e um caractere especial.");
+        return false;
+    }
+
+    // 3. Validar Domínio de E-mail Específico (Apenas no Cadastro)
+    if (isCadastro) {
+        // Lista restrita conforme sua solicitação
+        const dominiosPermitidos = [
+            'gmail.com', 
+            'hotmail.com', 
+            'unifametro.edu.br', 
+            'yahoo.com', 
+            'icloud.com',
+            'outlook.com'
+        ];
+        
+        const dominioExtraido = email.split('@')[1]?.toLowerCase(); // Pega o que vem após o @
+
+        if (!dominiosPermitidos.includes(dominioExtraido)) {
+            alert("Use um e-mail de um servidor permitido: Gmail, Hotmail, Unifametro, Yahoo ou iCloud.");
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/* ============================================================
+   CONFIGURAÇÕES GERAIS
+   ============================================================ */
+
 function togglePassword(inputId) {
     const passInput = document.getElementById(inputId);
     if (!passInput) return;
-    
     const eyeIcon = passInput.nextElementSibling;
-
     if (passInput.type === 'password') {
         passInput.type = 'text';
         if (eyeIcon) eyeIcon.textContent = 'visibility_off';
@@ -20,14 +59,13 @@ function togglePassword(inputId) {
     }
 }
 
-// Função de Logout
 function logout() {
-    localStorage.clear(); // Limpa os dados do usuário para segurança
+    localStorage.clear();
     window.location.href = 'login.html'; 
 }
 
 /* ============================================================
-   LÓGICA DE LOGIN (VERIFICAÇÃO NO BANCO)
+   LÓGICA DE LOGIN (Simplificada)
    ============================================================ */
 const loginForm = document.getElementById('loginForm');
 
@@ -37,6 +75,13 @@ if (loginForm) {
 
         const matricula = document.getElementById('matricula').value;
         const senha = document.getElementById('senha').value;
+
+        // No Login, apenas validamos o formato da matrícula para poupar o servidor
+        const matriculaRegex = /^\d-\d{10}$/;
+        if (!matriculaRegex.test(matricula)) {
+            alert("Formato de matrícula inválido (0-0000000000)");
+            return;
+        }
 
         try {
             const response = await fetch(`${API_URL}/login`, {
@@ -49,25 +94,21 @@ if (loginForm) {
 
             if (response.ok) {
                 alert(`Bem-vindo, ${data.user.nome}!`);
-                
-                // Salvando dados na sessão para o Dashboard
                 localStorage.setItem('usuarioNome', data.user.nome);
                 localStorage.setItem('usuarioTipo', data.user.tipo_id);
-                
                 window.location.href = 'dashboard.html';
             } else {
+                // Aqui o erro vem do banco (senha errada ou usuário não existe)
                 alert("❌ " + (data.error || "Matrícula ou senha incorretos"));
             }
-
         } catch (error) {
-            console.error("Erro na conexão:", error);
-            alert("⚠️ Servidor offline! Inicie o 'node server.js' no terminal.");
+            alert("⚠️ Erro de conexão com o servidor.");
         }
     });
 }
 
 /* ============================================================
-   LÓGICA DE CADASTRO REAL (CONECTADA AO BACK-END)
+   LÓGICA DE CADASTRO (Com Validação de Domínio e Duplicidade)
    ============================================================ */
 const cadastroForm = document.getElementById('cadastroForm');
 
@@ -82,12 +123,19 @@ if (cadastroForm) {
         const senha = document.getElementById('senha').value;
         const confirmarSenha = document.getElementById('confirmar-senha').value;
 
+        // 1. Verificar se as senhas batem
         if (senha !== confirmarSenha) {
             alert("As senhas não coincidem!");
             return;
         }
 
-        // Professor = 1, Aluno = 3 (conforme tbPessoaTipo)
+        // 2. CHAMADA DA VALIDAÇÃO (Regras de e-mail, senha forte e matrícula)
+        // Isso vai garantir que @unifametro.edu.br, @gmail, etc., sejam respeitados
+        if (typeof validarDados === "function") {
+            const dadosValidos = validarDados(email, senha, matricula, true);
+            if (!dadosValidos) return; // Se a validação falhar (alert), para o código aqui
+        }
+
         const tipo_id = (tipoConta === 'professor') ? 1 : 3;
 
         try {
@@ -101,13 +149,21 @@ if (cadastroForm) {
 
             if (response.ok) {
                 alert("✅ Cadastro realizado com sucesso!");
-                window.location.href = 'login.html'; // Manda para o login após cadastrar
+                window.location.href = 'login.html';
             } else {
-                alert("❌ Erro no cadastro: " + (data.error || "Tente novamente"));
+                // Tratamento para e-mail ou matrícula já cadastrados no banco
+                if (data.error && data.error.includes("Duplicate entry")) {
+                    if (data.error.includes(email)) {
+                        alert("❌ Este e-mail já está cadastrado!");
+                    } else if (data.error.includes(matricula)) {
+                        alert("❌ Esta matrícula já está em uso!");
+                    }
+                } else {
+                    alert("❌ Erro no cadastro: " + (data.error || "Tente novamente"));
+                }
             }
-
         } catch (error) {
-            alert("⚠️ O servidor está desligado! Ligue o node server.js");
+            alert("⚠️ Erro de conexão. Verifique se o servidor no Railway está ativo.");
         }
     });
 }

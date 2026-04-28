@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Usuários - Agenda</title>
+    <link rel="icon" type="image/png" href="agenda.png-removebg-preview (1).png">
+    <link rel="stylesheet" href="usuarios.css"> <!-- Reutilizando o CSS base -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<div class="main-content">
+    <header class="main-header">
+        <div class="header-content">
+            <a href="dashboard.html" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            
+            <div class="logo-area">
+                <div class="icon-box" style="background: #e7f3ed; color: #2d7a50;">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                
+                <div class="text-group">
+                    <h1>Usuários</h1>
+                    <p>Gerencie os acessos e perfis do sistema</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="content-container">
+        <div class="top-actions">
+            <div class="toggle-user">
+                <!-- Filtros de visualização rápidos -->
+                <button id="btn-view-todos" class="active" onclick="filtrarUsuarios('todos')">
+                    Todos
+                </button>
+                <button id="btn-view-admin" onclick="filtrarUsuarios('admin')">
+                    Administradores
+                </button>
+                <button id="btn-view-professores" onclick="filtrarUsuarios('professores')">
+                    Professores
+                </button>
+                <button id="btn-view-coordenadores" onclick="filtrarUsuarios('coordenadores')">
+                    Coordenadores
+                </button>
+                <button id="btn-view-suportes" onclick="filtrarUsuarios('suportes')">
+                    Suportes
+                </button>
+                <button id="btn-view-alunos" onclick="filtrarUsuarios('alunos')">
+                    Alunos
+                </button>
+            </div>
+
+            <button class="btn-novo-user" id="btnAbrirModalUsuario" style="background-color: #2d7a50;">
+                <i class="fa-solid fa-user-plus"></i> Novo Usuário
+            </button>
+        </div>
+
+        <div class="table-card">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Cargo/Função</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-usuarios">
+                    <!-- Exemplo de linha que virá do banco -->
+                    
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<!-- Modal de Cadastro de Usuário -->
+<div id="modalUsuario" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div>
+                <h2>Novo Usuário</h2>
+                <p style="color: #2d7a50; font-size: 0.85rem; margin-top: 4px;">Cadastre um novo membro na plataforma.</p>
+            </div>
+            <span class="close-modal" id="fecharModal">&times;</span>
+        </div>
+        
+        <form id="formUsuario">
+            <div class="input-group">
+                <label>Nome Completo *</label>
+                <input type="text" id="nomeUsuario" placeholder="Ex: Maria Oliveira" required>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group" style="flex: 2;">
+                    <label>E-mail Acadêmico *</label>
+                    <input type="email" id="emailUsuario" placeholder="exemplo@unifametro.edu.br" required>
+                </div>
+                <div class="input-group">
+                    <label>Cargo *</label>
+                    <select id="cargoUsuario" required>
+                        <option value="">Selecione...</option>
+                        <option value="Professor">Professor</option>
+                        <option value="Coordenador">Coordenador</option>
+                        <option value="Administrador">Administrador</option>
+                        <option value="Suporte">Suporte</option>
+                        <option value="Aluno">Aluno</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Senha Provisória *</label>
+                    <input type="password" id="senhaUsuario" placeholder="********" required>
+                </div>
+                <div class="input-group">
+                    <label>Setor *</label>
+                    <input type="text" id="setorUsuario" placeholder="Ex: TI / Coordenação">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" id="btnCancelarUser">Cancelar</button>
+                <button type="submit" class="btn-save">Salvar Usuário</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+    lucide.createIcons();
+
+    // Lógica Simples para abrir/fechar modal (baseada na sua tela de aulas)
+    const modal = document.getElementById("modalUsuario");
+    const btn = document.getElementById("btnAbrirModalUsuario");
+    const span = document.getElementById("fecharModal");
+    const btnCancel = document.getElementById("btnCancelarUser");
+
+    btn.onclick = () => modal.style.display = "block";
+    span.onclick = () => modal.style.display = "none";
+    btnCancel.onclick = () => modal.style.display = "none";
+
+    window.onclick = (event) => {
+        if (event.target == modal) modal.style.display = "none";
+    }
+</script>
+<script src="usuarios.js"></script>
+</body>
+</html>

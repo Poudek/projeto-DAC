@@ -81,3 +81,26 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
+
+app.get('/api/usuarios', (req, res) => {
+    // Ajustado para 'tbUsuarios' conforme usado no restante do código
+    const query = `
+        SELECT 
+            u.id, 
+            u.nome, 
+            u.email, 
+            t.descricao AS cargo 
+        FROM tbUsuarios u
+        INNER JOIN tbPessoaTipo t ON u.tipo_id = t.id
+        ORDER BY u.nome ASC`;
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error("❌ Erro no SQL ao buscar usuários:", err.message);
+            return res.status(500).json({ error: "Erro ao buscar dados no banco" });
+        }
+        
+        console.log(`✅ ${results.length} usuários encontrados.`);
+        res.json(results); 
+    });
+});

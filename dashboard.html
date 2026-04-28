@@ -51,6 +51,14 @@
 
     <hr class="divider">
 
+    <!-- NOVO: Item de Usuários na Sidebar -->
+    <a href="usuarios.html" class="menu-item">
+    <div class="icon-container">
+        <i data-lucide="user-plus"></i>
+    </div>
+    <span class="menu-text">Usuários</span>
+    </a>
+
     <a href="index.html" class="menu-item logout-section">
         <div class="icon-container">
             <i data-lucide="log-out"></i>
@@ -109,6 +117,19 @@
             <span id="count-eventos-total">0</span> pendentes
         </div>
     </a>
+
+    <!-- NOVO: Card de Usuários no Dashboard -->
+    <a href="usuarios.html" class="dash-card">
+    <div class="icon-box">
+        <span class="material-symbols-outlined">person_add</span>
+    </div>
+    <h3>Usuários</h3>
+    <p>Cadastre e gerencie acessos</p>
+    <div class="status-label">
+        <span id="count-usuarios">0</span> usuários
+    </div>
+    </a>
+
 </div>
     </main>
     <script src="script.js"></script>

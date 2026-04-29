@@ -1,6 +1,7 @@
 /* ============================================================
    CONFIGURAÇÕES E VARIÁVEIS GLOBAIS
-   ============================================================ */
+   ============================================================ */ 
+   const API_URL = "https://projeto-dac-production.up.railway.app";
 let usuarioIdEmEdicao = null;
 let listaCompletaUsuarios = [];
 
@@ -151,11 +152,12 @@ window.filtrarUsuarios = function(categoria) {
    ============================================================ */
 async function carregarUsuariosServidor() {
     try {
-        const response = await fetch('http://localhost:3000/api/usuarios');
+        // CORREÇÃO: Usando API_URL em vez de localhost
+        const response = await fetch(`${API_URL}/api/usuarios`);
         listaCompletaUsuarios = await response.json();
         renderizarTabela(listaCompletaUsuarios);
     } catch (error) {
-        console.error('Erro:', error);
+        console.error('Erro ao carregar usuários:', error);
     }
 }
 
@@ -175,8 +177,8 @@ if (formUsuario) {
         if (!validarDadosUsuario(dados)) return;
 
         const url = usuarioIdEmEdicao 
-            ? `http://localhost:3000/api/usuarios/${usuarioIdEmEdicao}` 
-            : 'http://localhost:3000/cadastro';
+            ? `${API_URL}/api/usuarios/${usuarioIdEmEdicao}` 
+            : `${API_URL}/cadastro`;
         
         const metodo = usuarioIdEmEdicao ? 'PUT' : 'POST';
 
@@ -201,7 +203,7 @@ if (formUsuario) {
 window.editarCargo = async function(id) {
     usuarioIdEmEdicao = id;
     try {
-        const response = await fetch(`http://localhost:3000/api/usuarios/${id}`);
+        const response = await fetch(`${API_URL}/api/usuarios/${id}`);
         const user = await response.json();
 
         document.getElementById('nomeUsuario').value = user.nome;
@@ -218,7 +220,7 @@ window.editarCargo = async function(id) {
 window.removerUsuario = async function(id) {
     if (confirm("⚠️ Excluir usuário definitivamente?")) {
         try {
-            await fetch(`http://localhost:3000/api/usuarios/${id}`, { method: 'DELETE' });
+            await fetch(`${API_URL}/api/usuarios/${id}`, { method: 'DELETE' });
             carregarUsuariosServidor();
         } catch (error) { console.error(error); }
     }

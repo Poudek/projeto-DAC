@@ -32,7 +32,7 @@ function validarDados(email, senha, matricula, isCadastro = true) {
             return false;
         }
     }
-    return true;
+     return true;
 }
 
 /* ============================================================

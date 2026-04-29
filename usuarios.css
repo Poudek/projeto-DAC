@@ -355,3 +355,28 @@ body {
 #lista-usuarios tr:nth-child(3) { animation-delay: 0.15s; }
 #lista-usuarios tr:nth-child(4) { animation-delay: 0.20s; }
 #lista-usuarios tr:nth-child(5) { animation-delay: 0.25s; }
+
+.export-actions {
+    display: flex;
+    gap: 15px;
+}
+.btn-export {
+    background-color: #27ae60; /* Verde para destacar ação de saída/sucesso */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+.btn-export:hover {
+    background-color: #c53030;
+}
+
+.btn-export i {
+    font-size: 1.1rem;
+}

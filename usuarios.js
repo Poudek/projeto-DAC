@@ -106,7 +106,6 @@ function renderizarTabela(usuarios) {
                 <td><strong>${user.nome}</strong></td>
                 <td>${user.email}</td>
                 <td><span class="${classeCargo}">${cargoNome}</span></td>
-                <td><span class="status-ativo">● Ativo</span></td>
                 <td style="text-align: right;">
                     <button class="btn-acao-tabela" onclick="editarCargo(${user.id})">
                         <i class="fa-solid fa-user-gear"></i>
@@ -234,5 +233,64 @@ function configurarToggleSenha() {
             this.classList.toggle('fa-eye');
             this.classList.toggle('fa-eye-slash');
         };
+    }
+}
+
+async function exportarUsuariosPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    try {
+        // Substitua pela sua URL real da API
+        const response = await fetch(`${API_URL}/api/usuarios`); 
+        const usuarios = await response.json();
+
+        if (!usuarios || usuarios.length === 0) {
+            alert("Não há dados no banco para exportar.");
+            return;
+        }
+
+       // Título em Verde
+        doc.setFontSize(18);
+        doc.setTextColor(39, 174, 96); // Verde #27ae60
+        doc.text("Relatório de Usuários - Agenda Acadêmica", 14, 20);
+
+        doc.setDrawColor(39, 174, 96);
+        doc.line(14, 23, 196, 23);
+        
+        doc.setFontSize(10);
+    doc.setTextColor(100);
+    const dataHoje = new Date().toLocaleString('pt-BR');
+    doc.text(`Gerado em: ${dataHoje}`, 14, 30);
+
+        // Mapeamento SEM a coluna de Status
+        const colunas = ["Nome", "E-mail", "Cargo/Função"];
+        const linhas = usuarios.map(u => [
+            u.nome || u.username || "---", 
+            u.email || "---", 
+            u.cargo || u.funcao || u.nivel || "---"
+        ]);
+
+        // Gerar a tabela com o estilo do projeto
+        doc.autoTable({
+            head: [colunas],
+            body: linhas,
+            startY: 35,
+            theme: 'striped',
+            headStyles: { 
+                fillColor: [39, 174, 96], // Verde #27ae60
+                textColor: 255,
+                fontStyle: 'bold' 
+            },
+            styles: { fontSize: 10 },
+            alternateRowStyles: { fillColor: [235, 245, 238] }, // Verde claro para linhas alternadas
+        });
+
+        // Salvar o arquivo
+        doc.save(`usuarios_agenda_${new Date().toLocaleDateString('pt-BR')}.pdf`);
+
+    } catch (error) {
+        console.error("Erro na exportação:", error);
+        alert("Erro ao conectar com o banco para gerar o PDF.");
     }
 }

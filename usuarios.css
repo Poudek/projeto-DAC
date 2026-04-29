@@ -162,28 +162,28 @@ body {
 }
 
 /* Administrador - Vermelho/Rosa (Urgência/Poder) */
-.tag-cargo.admin {
+.tag-cargo.administr {
     background-color: #fee2e2;
     color: #991b1b;
     border-color: #fecaca;
 }
 
 /* Coordenador - Roxo/Azul Escuro (Gestão) */
-.tag-cargo.coord {
+.tag-cargo.coorden {
     background-color: #e0e7ff;
     color: #3730a3;
     border-color: #c7d2fe;
 }
 
 /* Professor - Verde (Cor do Projeto/Acadêmico) */
-.tag-cargo.prof {
+.tag-cargo.professor {
     background-color: #d1fae5;
     color: #065f46;
     border-color: #a7f3d0;
 }
 
 /* Suporte - Laranja/Amarelo (Atenção/Técnico) */
-.tag-cargo.suporte { /* Usado para Secretaria */
+.tag-cargo.secret { /* Usado para Secretaria */
     background-color: #fff7ed;
     color: #c2410c;
     border: 1px solid #fdba74;

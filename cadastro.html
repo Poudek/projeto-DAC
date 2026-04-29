@@ -39,12 +39,16 @@
             <input type="text" id="matricula" placeholder="Nº da matrícula" required>
         </div>
         <div class="input-group">
-            <label>Tipo de Conta</label>
-            <select id="tipo-conta" required>
-                <option value="" disabled selected>Selecione</option>
-                <option value="professor">Professor</option>
-                <option value="aluno">Aluno</option>
-            </select>
+            <!-- No seu formulário de cadastro -->
+<label for="tipo-conta">Tipo de Conta</label>
+<select id="tipo-conta" name="tipo-conta">
+            <option value="">Selecione</option>
+            <option value="administrador">Administrador</option>
+            <option value="professor">Professor</option>
+            <option value="coordenador">Coordenador</option>
+            <option value="secretaria">Secretaria</option>
+            <option value="aluno">Aluno</option>
+</select>
         </div>
     </div>
 
@@ -70,6 +74,7 @@
             </div>
         </section>
     </div>
+    <script src="auth.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

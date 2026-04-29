@@ -7,8 +7,6 @@
     <link rel="icon" type="image/png" href="agenda.png-removebg-preview (1).png">
     <link rel="stylesheet" href="usuarios.css"> <!-- Reutilizando o CSS base -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
@@ -143,20 +141,25 @@
     </div>
 </div>
 
-<script src="https://unpkg.com/lucide@latest"></script>
-<script>
-    lucide.createIcons();
+<!-- 1. Ícones -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+        document.getElementById("fecharModal").onclick = () => fecharLimparModal();
+        window.onclick = (event) => {
+            const modal = document.getElementById("modalUsuario");
+            if (event.target == modal) fecharLimparModal();
+        }
+    </script>
 
-    // REMOVIDA A LÓGICA ANTIGA QUE ESTAVA AQUI PARA NÃO DAR CONFLITO
-    // O controle agora é feito 100% pelo usuarios.js através das funções globais
-    
-    // Apenas o fechar no (X) e clicar fora:
-    document.getElementById("fecharModal").onclick = () => fecharLimparModal();
-    window.onclick = (event) => {
-        const modal = document.getElementById("modalUsuario");
-        if (event.target == modal) fecharLimparModal();
-    }
-</script>
-<script src="usuarios.js"></script>
+    <!-- 2. Bibliotecas de PDF (Essencial vir antes do usuarios.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- 3. Segurança (Verifique se o caminho é 'auth.js' ou 'js/auth.js') -->
+    <script src="auth.js"></script> 
+
+    <!-- 4. Lógica da Página (Usa as funções do Auth e do jsPDF) -->
+    <script src="usuarios.js"></script>
 </body>
 </html>

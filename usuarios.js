@@ -1,16 +1,22 @@
 /* ============================================================
-   CONFIGURAÇÕES E VARIÁVEIS GLOBAIS
-   ============================================================ */ 
-   const API_URL = "https://projeto-dac-production.up.railway.app";
-let usuarioIdEmEdicao = null;
-let listaCompletaUsuarios = [];
+   usuarios.js - GESTÃO RESTRITA (ADMINISTRADOR)
+   ============================================================ */
 
-// Seletores do DOM
-const formUsuario = document.getElementById('formUsuario');
-const modalUsuario = document.getElementById('modalUsuario');
-const tabelaCorpo = document.getElementById('lista-usuarios');
-const senhaInput = document.getElementById('senhaUsuario');
-const toggleSenha = document.getElementById('toggleSenha');
+// 1. Bloqueio imediato se não for Admin
+Auth.validarAcesso('administrador');
+
+const API_URL = "https://projeto-dac-production.up.railway.app";
+let listaCompletaUsuarios = [];
+let usuarioIdEmEdicao = null;
+
+// Cache de Seletores do DOM
+const dom = {
+    tabela: document.getElementById('lista-usuarios'),
+    form: document.getElementById('formUsuario'),
+    modal: document.getElementById('modalUsuario'),
+    senha: document.getElementById('senhaUsuario'),
+    toggle: document.getElementById('toggleSenha')
+};
 
 /* ============================================================
    INICIALIZAÇÃO
@@ -18,162 +24,59 @@ const toggleSenha = document.getElementById('toggleSenha');
 document.addEventListener('DOMContentLoaded', () => {
     carregarUsuariosServidor();
     configurarToggleSenha();
+    configurarEnvioFormulario(); // Adicionado: ativa a escuta do formulário
 });
 
 /* ============================================================
-   VALIDAÇÃO DE DADOS (CRITÉRIOS DE CADASTRO)
+   LÓGICA DE SALVAMENTO (NOVO OU EDIÇÃO)
    ============================================================ */
-function validarDadosUsuario(dados) {
-    const emailSufixo = "@unifametro.edu.br";
-    
-    // REGEX ATUALIZADA: 1 dígito, hífen, 10 dígitos (Ex: 1-1234567890)
-    const matriculaRegex = /^\d{1}-\d{10}$/; 
-    
-    // REGEX DA SENHA: Mínimo 8 caracteres, 1 maiúscula, 1 especial
-    const senhaRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
-
-    // 1. Validação de E-mail
-    if (!dados.email.endsWith(emailSufixo)) {
-        alert(`O e-mail deve ser institucional: exemplo${emailSufixo}`);
-        return false;
-    }
-
-    // 2. Validação de Matrícula (Padrão 0-0000000000)
-    if (!matriculaRegex.test(dados.matricula)) {
-        alert("A matrícula deve seguir o padrão: 0-0000000000");
-        return false;
-    }
-
-    // 3. Validação de Senha
-    if (!senhaRegex.test(dados.senha)) {
-        alert("A senha não atende aos critérios:\n• Mínimo 8 caracteres\n• 1 Letra Maiúscula\n• 1 Caractere Especial");
-        return false;
-    }
-
-    return true; 
-}
-
 /* ============================================================
-   GESTÃO DO MODAL
+   LÓGICA DE SALVAMENTO COM VALIDAÇÃO RÍGIDA
    ============================================================ */
-window.abrirModalNovoUsuario = function() {
-    usuarioIdEmEdicao = null;
-    if (formUsuario) formUsuario.reset(); 
+function configurarEnvioFormulario() {
+    if (!dom.form) return;
 
-    document.querySelector('#modalUsuario h2').innerText = "Novo Usuário";
-    document.querySelector('#modalUsuario p').innerText = "Cadastre um novo membro na plataforma.";
-    
-    if (senhaInput) senhaInput.type = 'password';
-    if (toggleSenha) {
-        toggleSenha.classList.add('fa-eye');
-        toggleSenha.classList.remove('fa-eye-slash');
-    }
-
-    modalUsuario.style.display = 'block';
-};
-
-window.fecharLimparModal = function() {
-    usuarioIdEmEdicao = null;
-    if (formUsuario) formUsuario.reset();
-    modalUsuario.style.display = 'none';
-};
-
-/* ============================================================
-   FILTRAGEM E RENDERIZAÇÃO
-   ============================================================ */
-function renderizarTabela(usuarios) {
-    if (!tabelaCorpo) return;
-    tabelaCorpo.innerHTML = '';
-
-    if (usuarios.length === 0) {
-        tabelaCorpo.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum usuário encontrado.</td></tr>';
-        return;
-    }
-
-    usuarios.forEach(user => {
-        let classeCargo = 'tag-cargo';
-        const cargoNome = user.cargo || 'Não definido';
-        const cargoNormalizado = cargoNome.toLowerCase();
-
-        if (cargoNormalizado === 'administrador') classeCargo += ' admin';
-        else if (cargoNormalizado === 'coordenador') classeCargo += ' coord';
-        else if (cargoNormalizado === 'professor') classeCargo += ' prof';
-        else if (cargoNormalizado === 'secretaria') classeCargo += ' suporte';
-        else if (cargoNormalizado === 'aluno') classeCargo += ' aluno';
-        
-        const row = `
-            <tr>
-                <td><strong>${user.nome}</strong></td>
-                <td>${user.email}</td>
-                <td><span class="${classeCargo}">${cargoNome}</span></td>
-                <td style="text-align: right;">
-                    <button class="btn-acao-tabela" onclick="editarCargo(${user.id})">
-                        <i class="fa-solid fa-user-gear"></i>
-                    </button>
-                    <button class="btn-acao-tabela btn-delete" onclick="removerUsuario(${user.id})">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </td>
-            </tr>`;
-        tabelaCorpo.innerHTML += row;
-    });
-}
-
-window.filtrarUsuarios = function(categoria) {
-    document.querySelectorAll('.toggle-user button').forEach(btn => btn.classList.remove('active'));
-    if (event && event.currentTarget) event.currentTarget.classList.add('active');
-    
-    const tabela = document.getElementById('lista-usuarios');
-    tabela.style.opacity = '0';
-
-    setTimeout(() => {
-        if (categoria === 'todos') {
-            renderizarTabela(listaCompletaUsuarios);
-        } else {
-            const filtrados = listaCompletaUsuarios.filter(user => {
-                const cargo = (user.cargo || "").toLowerCase();
-                if (categoria === 'admin') return cargo === 'administrador';
-                if (categoria === 'professores') return cargo === 'professor';
-                if (categoria === 'coordenadores') return cargo === 'coordenador';
-                if (categoria === 'suportes') return cargo === 'secretaria';
-                if (categoria === 'alunos') return cargo === 'aluno';
-                return false;
-            });
-            renderizarTabela(filtrados);
-        }
-        tabela.style.opacity = '1';
-        tabela.style.transition = 'opacity 0.2s ease';
-    }, 100);
-};
-
-/* ============================================================
-   OPERACIONAL (API)
-   ============================================================ */
-async function carregarUsuariosServidor() {
-    try {
-        // CORREÇÃO: Usando API_URL em vez de localhost
-        const response = await fetch(`${API_URL}/api/usuarios`);
-        listaCompletaUsuarios = await response.json();
-        renderizarTabela(listaCompletaUsuarios);
-    } catch (error) {
-        console.error('Erro ao carregar usuários:', error);
-    }
-}
-
-if (formUsuario) {
-    formUsuario.addEventListener('submit', async (event) => {
-        event.preventDefault();
+    dom.form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
         const dados = {
-            nome: document.getElementById('nomeUsuario').value,
-            email: document.getElementById('emailUsuario').value,
+            nome: document.getElementById('nomeUsuario').value.trim(),
+            email: document.getElementById('emailUsuario').value.trim(),
             tipo_id: document.getElementById('cargoUsuario').value,
-            matricula: document.getElementById('matriculaUsuario').value,
-            senha: senhaInput.value
+            matricula: document.getElementById('matriculaUsuario').value.trim(),
+            senha: dom.senha.value
         };
 
-        // Validação antes do Fetch
-        if (!validarDadosUsuario(dados)) return;
+        // --- INÍCIO DA VALIDAÇÃO (OS REQUISITOS VOLTARAM!) ---
+
+        // 1. Validação de E-mail Institucional
+        const emailSufixo = "@unifametro.edu.br";
+        if (!dados.email.endsWith(emailSufixo)) {
+            alert(`Erro: O e-mail deve ser institucional (${emailSufixo}).`);
+            return;
+        }
+
+        // 2. Validação de Matrícula (Padrão 0-0000000000)
+        const matriculaRegex = /^\d{1}-\d{10}$/; 
+        if (!matriculaRegex.test(dados.matricula)) {
+            alert("Erro: A matrícula deve seguir o padrão: 0-0000000000");
+            return;
+        }
+
+        // 3. Validação de Senha (Apenas se estiver criando ou se o campo não estiver vazio)
+        // Regra: Mínimo 8 caracteres, 1 Letra Maiúscula, 1 Número, 1 Especial
+        const senhaRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        
+        // Se for NOVO usuário, a senha é obrigatória e precisa ser forte
+        // Se for EDIÇÃO, validamos apenas se o usuário digitou algo para trocar a senha
+        if (!usuarioIdEmEdicao || dados.senha.length > 0) {
+            if (!senhaRegex.test(dados.senha)) {
+                alert("Erro: A senha não atende aos critérios de segurança:\n- Mínimo 8 caracteres\n- Pelo menos uma letra maiúscula\n- Pelo menos um número\n- Pelo menos um caractere especial (@$!%*?&)");
+                return;
+            }
+        }
+
+        // --- FIM DA VALIDAÇÃO ---
 
         const url = usuarioIdEmEdicao 
             ? `${API_URL}/api/usuarios/${usuarioIdEmEdicao}` 
@@ -189,108 +92,213 @@ if (formUsuario) {
             });
 
             if (response.ok) {
-                alert(usuarioIdEmEdicao ? "✅ Atualizado!" : "✅ Cadastrado!");
+                alert(usuarioIdEmEdicao ? "✅ Usuário atualizado!" : "✅ Usuário cadastrado com sucesso!");
                 fecharLimparModal();
                 carregarUsuariosServidor();
+            } else {
+                const erro = await response.json();
+                alert("❌ Erro no servidor: " + (erro.error || "Falha na operação"));
             }
         } catch (error) {
-            console.error("Erro:", error);
+            console.error("Erro ao salvar:", error);
+            alert("⚠️ Erro de conexão com o servidor.");
         }
     });
 }
 
+/* ============================================================
+   FUNÇÕES DE CARREGAMENTO E RENDERIZAÇÃO
+   ============================================================ */
+async function carregarUsuariosServidor() {
+    try {
+        const response = await fetch(`${API_URL}/api/usuarios`);
+        listaCompletaUsuarios = await response.json();
+        renderizarTabela(listaCompletaUsuarios);
+    } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+    }
+}
+
+function renderizarTabela(usuarios) {
+    if (!dom.tabela) return;
+    dom.tabela.innerHTML = '';
+
+    if (usuarios.length === 0) {
+        dom.tabela.innerHTML = '<tr><td colspan="4" style="text-align:center;">Nenhum usuário encontrado.</td></tr>';
+        return;
+    }
+
+    usuarios.forEach(user => {
+        const cargo = user.cargo || 'Não definido';
+        const cargoClasse = cargo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace('aria', '').replace('ador', '');
+
+        const row = `
+            <tr>
+                <td><strong>${user.nome}</strong></td>
+                <td>${user.email}</td>
+                <td><span class="tag-cargo ${cargoClasse}">${cargo}</span></td>
+                <td style="text-align: right;">
+                    <button class="btn-acao-tabela" onclick="editarCargo(${user.id})" title="Editar">
+                        <i class="fa-solid fa-user-gear"></i>
+                    </button>
+                    <button class="btn-acao-tabela btn-delete" onclick="removerUsuario(${user.id})" title="Excluir">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
+            </tr>`;
+        dom.tabela.innerHTML += row;
+    });
+}
+
+/* ============================================================
+   FILTROS E MODAL
+   ============================================================ */
+window.filtrarUsuarios = function(categoria) {
+    // 1. Atualiza visualmente os botões
+    document.querySelectorAll('.toggle-user button').forEach(btn => btn.classList.remove('active'));
+    if (event?.currentTarget) event.currentTarget.classList.add('active');
+
+    // 2. Se for 'todos', renderiza a lista completa e encerra
+    if (categoria === 'todos') {
+        renderizarTabela(listaCompletaUsuarios);
+        return;
+    }
+
+    // 3. Lógica de filtro aprimorada
+    const filtrados = listaCompletaUsuarios.filter(user => {
+        // Transformamos o cargo do banco em algo fácil de comparar (minúsculo e sem acento)
+        const cargoBanco = (user.cargo || "")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+
+        // Mapeamos o que vem do botão para o que está no banco
+        const termosBusca = {
+            'admin': 'administrador',
+            'professores': 'professor',
+            'coordenadores': 'coordenador',
+            'suportes': 'secretaria',
+            'alunos': 'aluno'
+        };
+
+        const alvo = termosBusca[categoria] || categoria;
+        
+        // Compara se o cargo do banco contém o termo de busca
+        return cargoBanco.includes(alvo);
+    });
+
+    renderizarTabela(filtrados);
+};
+
+window.abrirModalNovoUsuario = function() {
+    usuarioIdEmEdicao = null;
+    dom.form?.reset();
+    document.querySelector('#modalUsuario h2').innerText = "Novo Usuário";
+    dom.modal.style.display = 'block';
+};
+
+window.fecharLimparModal = function() {
+    usuarioIdEmEdicao = null;
+    dom.form?.reset();
+    dom.modal.style.display = 'none';
+};
+
 window.editarCargo = async function(id) {
     usuarioIdEmEdicao = id;
     try {
-        const response = await fetch(`${API_URL}/api/usuarios/${id}`);
-        const user = await response.json();
+        const res = await fetch(`${API_URL}/api/usuarios/${id}`);
+        const user = await res.json();
 
         document.getElementById('nomeUsuario').value = user.nome;
         document.getElementById('emailUsuario').value = user.email;
         document.getElementById('matriculaUsuario').value = user.matricula;
-        document.getElementById('senhaUsuario').value = user.senha;
         document.getElementById('cargoUsuario').value = user.tipo_id;
-
+        
         document.querySelector('#modalUsuario h2').innerText = "Editar Usuário";
-        modalUsuario.style.display = 'block';
+        dom.modal.style.display = 'block';
     } catch (error) { console.error(error); }
 };
 
 window.removerUsuario = async function(id) {
-    if (confirm("⚠️ Excluir usuário definitivamente?")) {
-        try {
-            await fetch(`${API_URL}/api/usuarios/${id}`, { method: 'DELETE' });
-            carregarUsuariosServidor();
-        } catch (error) { console.error(error); }
+    if (!confirm("⚠️ Excluir usuário definitivamente?")) return;
+    try {
+        const res = await fetch(`${API_URL}/api/usuarios/${id}`, { method: 'DELETE' });
+        if (res.ok) carregarUsuariosServidor();
+    } catch (error) { console.error(error); }
+};
+
+/* ============================================================
+   EXPORTAÇÃO PDF
+   ============================================================ */
+/* ============================================================
+   EXPORTAÇÃO PDF DINÂMICA (FILTRADA)
+   ============================================================ */
+window.exportarUsuariosPDF = async function() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const verde = [39, 174, 96];
+
+    // 1. Pegamos todas as linhas da tabela que estão visíveis no momento
+    const linhasTabela = document.querySelectorAll('#lista-usuarios tr');
+    
+    // 2. Se a tabela estiver vazia (ou com a mensagem de "Nenhum usuário"), avisamos o usuário
+    if (linhasTabela.length === 0 || (linhasTabela.length === 1 && linhasTabela[0].innerText.includes("Nenhum"))) {
+        alert("Não há dados visíveis para exportar.");
+        return;
     }
+
+    // 3. Extraímos os dados diretamente das células da tabela
+    const dadosParaPDF = [];
+    linhasTabela.forEach(linha => {
+        const colunas = linha.querySelectorAll('td');
+        if (colunas.length >= 3) {
+            dadosParaPDF.push([
+                colunas[0].innerText.trim(), // Nome
+                colunas[1].innerText.trim(), // E-mail
+                colunas[2].innerText.trim()  // Cargo
+            ]);
+        }
+    });
+
+    // 4. Identificamos qual filtro está ativo para colocar no título do PDF
+    const botaoAtivo = document.querySelector('.toggle-user button.active');
+    const categoriaNome = botaoAtivo ? botaoAtivo.innerText : "Geral";
+
+    // Design do PDF
+    doc.setFontSize(18);
+    doc.setTextColor(...verde);
+    doc.text(`Relatório de Usuários - ${categoriaNome}`, 14, 20);
+    
+    doc.setDrawColor(...verde);
+    doc.line(14, 23, 196, 23);
+
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 14, 28);
+
+    const colunasCabeçalho = ["Nome", "E-mail", "Cargo"];
+
+    doc.autoTable({
+        head: [colunasCabeçalho],
+        body: dadosParaPDF,
+        startY: 35,
+        theme: 'striped',
+        headStyles: { fillColor: verde, textColor: 255 },
+        alternateRowStyles: { fillColor: [235, 245, 238] }
+    });
+
+    // Nome do arquivo dinâmico baseado no filtro
+    const nomeArquivo = `usuarios_${categoriaNome.toLowerCase().replace(/\s/g, '_')}_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`;
+    doc.save(nomeArquivo);
 };
 
 function configurarToggleSenha() {
-    if (toggleSenha && senhaInput) {
-        toggleSenha.onclick = function() {
-            const type = senhaInput.type === 'password' ? 'text' : 'password';
-            senhaInput.type = type;
-            this.classList.toggle('fa-eye');
-            this.classList.toggle('fa-eye-slash');
+    if (dom.toggle && dom.senha) {
+        dom.toggle.onclick = () => {
+            const type = dom.senha.type === 'password' ? 'text' : 'password';
+            dom.senha.type = type;
+            dom.toggle.classList.toggle('fa-eye');
+            dom.toggle.classList.toggle('fa-eye-slash');
         };
-    }
-}
-
-async function exportarUsuariosPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    try {
-        // Substitua pela sua URL real da API
-        const response = await fetch(`${API_URL}/api/usuarios`); 
-        const usuarios = await response.json();
-
-        if (!usuarios || usuarios.length === 0) {
-            alert("Não há dados no banco para exportar.");
-            return;
-        }
-
-       // Título em Verde
-        doc.setFontSize(18);
-        doc.setTextColor(39, 174, 96); // Verde #27ae60
-        doc.text("Relatório de Usuários - Agenda Acadêmica", 14, 20);
-
-        doc.setDrawColor(39, 174, 96);
-        doc.line(14, 23, 196, 23);
-        
-        doc.setFontSize(10);
-    doc.setTextColor(100);
-    const dataHoje = new Date().toLocaleString('pt-BR');
-    doc.text(`Gerado em: ${dataHoje}`, 14, 30);
-
-        // Mapeamento SEM a coluna de Status
-        const colunas = ["Nome", "E-mail", "Cargo/Função"];
-        const linhas = usuarios.map(u => [
-            u.nome || u.username || "---", 
-            u.email || "---", 
-            u.cargo || u.funcao || u.nivel || "---"
-        ]);
-
-        // Gerar a tabela com o estilo do projeto
-        doc.autoTable({
-            head: [colunas],
-            body: linhas,
-            startY: 35,
-            theme: 'striped',
-            headStyles: { 
-                fillColor: [39, 174, 96], // Verde #27ae60
-                textColor: 255,
-                fontStyle: 'bold' 
-            },
-            styles: { fontSize: 10 },
-            alternateRowStyles: { fillColor: [235, 245, 238] }, // Verde claro para linhas alternadas
-        });
-
-        // Salvar o arquivo
-        doc.save(`usuarios_agenda_${new Date().toLocaleDateString('pt-BR')}.pdf`);
-
-    } catch (error) {
-        console.error("Erro na exportação:", error);
-        alert("Erro ao conectar com o banco para gerar o PDF.");
     }
 }

@@ -1,67 +1,41 @@
 const API_URL = "https://projeto-dac-production.up.railway.app"; 
 
 /* ============================================================
-   UTILITÁRIOS DE VALIDAÇÃO (Sincronizados com a Gestão)
-   ============================================================ */
+   CONTROLE DE ACESSO (PROTEÇÃO DE PÁGINAS)
+   ============================================================ */
+if (!window.location.pathname.includes('index.html') && !window.location.pathname.includes('login.html')) {
+    Auth.validarAcesso();
+}
 
+/* ============================================================
+   UTILITÁRIOS DE VALIDAÇÃO
+   ============================================================ */
 function validarDados(email, senha, matricula, isCadastro = true) {
-    // 1. Validar Matrícula (Padrão 0-0000000000)
-    const matriculaRegex = /^\d-\d{10}$/;
-    if (!matriculaRegex.test(matricula)) {
-        alert("Formato de matrícula inválido! Use o padrão: 0-0000000000");
-        return false;
-    }
+    const matriculaRegex = /^\d-\d{10}$/;
+    if (!matriculaRegex.test(matricula)) {
+        alert("Formato de matrícula inválido! Use o padrão: 0-0000000000");
+        return false;
+    }
 
-    // 2. Validar Senha (Mínimo 8 caracteres, 1 Maiúscula, 1 Número, 1 Especial)
-    const senhaRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!senhaRegex.test(senha)) {
-        alert("A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, um número e um caractere especial.");
-        return false;
-    }
+    const senhaRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (isCadastro && !senhaRegex.test(senha)) {
+        alert("A senha deve ter pelo menos 8 caracteres, 1 letra maiúscula, 1 número e 1 caractere especial.");
+        return false;
+    }
 
-    // 3. Validar Domínio de E-mail (Apenas no Cadastro)
-    if (isCadastro) {
-        const dominiosPermitidos = [
-            'gmail.com', 'hotmail.com', 'unifametro.edu.br', 
-            'yahoo.com', 'icloud.com', 'outlook.com'
-        ];
-        const dominioExtraido = email.split('@')[1]?.toLowerCase();
-
-        if (!dominiosPermitidos.includes(dominioExtraido)) {
-            alert("Use um e-mail de um servidor permitido: Gmail, Hotmail, Unifametro, Yahoo ou iCloud.");
-            return false;
-        }
-    }
-     return true;
+    if (isCadastro) {
+        const dominiosPermitidos = ['gmail.com', 'hotmail.com', 'unifametro.edu.br', 'yahoo.com', 'icloud.com', 'outlook.com'];
+        const dominioExtraido = email.split('@')[1]?.toLowerCase();
+        if (!dominiosPermitidos.includes(dominioExtraido)) {
+            alert("Use um e-mail de um servidor permitido.");
+            return false;
+        }
+    }
+    return true;
 }
 
 /* ============================================================
-   CONFIGURAÇÕES GERAIS E UI
-   ============================================================ */
-
-function togglePassword(inputId) {
-    const passInput = document.getElementById(inputId);
-    if (!passInput) return;
-    const eyeIcon = passInput.nextElementSibling;
-    if (passInput.type === 'password') {
-        passInput.type = 'text';
-        if (eyeIcon) eyeIcon.textContent = 'visibility_off';
-    } else {
-        passInput.type = 'password';
-        if (eyeIcon) eyeIcon.textContent = 'visibility';
-    }
-}
-
-function logout() {
-     localStorage.clear();
-    window.location.href = 'login.html'; 
-}
-
-/* ============================================================
-   LÓGICA DE LOGIN
-   ============================================================ */
-/* ============================================================
-   LÓGICA DE LOGIN (Corrigida)
+   LÓGICA DE LOGIN (CORRIGIDA)
    ============================================================ */
 const loginForm = document.getElementById('loginForm');
 
@@ -71,15 +45,11 @@ if (loginForm) {
         const matricula = document.getElementById('matricula').value;
         const senha = document.getElementById('senha').value;
 
-        // No LOGIN, validamos APENAS o formato da matrícula para evitar envios inúteis
         const matriculaRegex = /^\d-\d{10}$/;
         if (!matriculaRegex.test(matricula)) {
-            alert("Formato de matrícula inválido! Use o padrão: 0-0000000000");
+            alert("Formato de matrícula inválido!");
             return;
         }
-
-        // REMOVEMOS a validação de senha forte daqui. 
-        // O servidor é quem dirá se a senha está correta ou não.
 
         try {
             const response = await fetch(`${API_URL}/login`, {
@@ -91,139 +61,199 @@ if (loginForm) {
             const data = await response.json();
 
             if (response.ok) {
-                alert(`Bem-vindo, ${data.user.nome}!`);
-                localStorage.setItem('usuarioNome', data.user.nome);
-                localStorage.setItem('usuarioTipo', data.user.tipo_id);
-                window.location.href = 'dashboard.html';
+                // CORREÇÃO CRÍTICA: Garantir que pegamos o objeto 'user' de dentro de 'data'
+                const usuarioParaSalvar = data.user;
+                
+                // Criamos um mapa para traduzir o ID numérico em Cargo (texto)
+                const nomesCargos = {
+                 1: 'Professor',
+        2: 'Coordenador',
+        3: 'Aluno',
+        4: 'Secretaria',
+        5: 'Administrador' // O seu caso!
+                                    };
+                // Adicionamos o campo 'cargo' ao objeto do usuário para facilitar o controle de acesso
+                if (usuarioParaSalvar) {
+                    usuarioParaSalvar.cargo = nomesCargos[usuarioParaSalvar.tipo_id] || 'Desconecido';
+                }
+
+                if (usuarioParaSalvar) {
+                    alert(`Bem-vindo, ${usuarioParaSalvar.nome}!`);
+                    
+                    // SALVAMENTO UNIFICADO: Salva o objeto completo (id, nome, cargo, tipo_id...)
+                    localStorage.setItem('usuarioLogado', JSON.stringify(usuarioParaSalvar));
+                    
+                    // Mantemos os campos individuais para compatibilidade com o restante do código
+                    localStorage.setItem('usuarioNome', usuarioParaSalvar.nome);
+                    localStorage.setItem('usuarioTipo', usuarioParaSalvar.tipo_id);
+
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert("⚠️ Erro: Dados do usuário não retornados pelo servidor.");
+                }
             } else {
                 alert("❌ " + (data.error || "Matrícula ou senha incorretos"));
             }
         } catch (error) {
+            console.error("Erro no login:", error);
             alert("⚠️ Erro de conexão com o servidor.");
         }
     });
 }
 
 /* ============================================================
-   LÓGICA DE CADASTRO
-   ============================================================ */
+   LÓGICA DE CADASTRO
+   ============================================================ */
+/* ============================================================
+   LÓGICA DE CADASTRO (CORRIGIDA E VALIDADA)
+   ============================================================ */
+/* ============================================================
+   LÓGICA DE CADASTRO (SINCRONIZADA COM OS NOVOS CARGOS)
+   ============================================================ */
 const cadastroForm = document.getElementById('cadastroForm');
 
 if (cadastroForm) {
-    cadastroForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const nome = document.getElementById('nome').value;
-        const email = document.getElementById('email').value;
-        const matricula = document.getElementById('matricula').value;
-        const tipoConta = document.getElementById('tipo-conta').value;
-        const senha = document.getElementById('senha').value;
-        const confirmarSenha = document.getElementById('confirmar-senha').value;
+    cadastroForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Impede o "sumiço" dos dados/refresh da página
 
-        if (senha !== confirmarSenha) {
-            alert("As senhas não coincidem!");
-            return;
-        }
+        const nome = document.getElementById('nome').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const matricula = document.getElementById('matricula').value.trim();
+        const tipoConta = document.getElementById('tipo-conta').value;
+        const senha = document.getElementById('senha').value;
+        const confirmarSenha = document.getElementById('confirmar-senha').value;
 
-        if (!validarDados(email, senha, matricula, true)) return;
+        // 1. Validação de senhas iguais
+        if (senha !== confirmarSenha) {
+            alert("❌ As senhas não coincidem!");
+            return;
+        }
 
-        const tipo_id = (tipoConta === 'professor') ? 1 : 3;
+        // 2. Validação de Regras (E-mail @unifametro, Matrícula 0-0000000000 e Senha Forte)
+        // Esta função deve estar definida no topo do seu script.js
+        if (typeof validarDados === 'function') {
+            if (!validarDados(email, senha, matricula, true)) return;
+        }
 
-        try {
-            const response = await fetch(`${API_URL}/cadastro`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, email, matricula, senha, tipo_id })
-            });
+        // 3. Mapeamento de IDs (Sincronizado com o seu banco de dados)
+        const mapaCadastro = {
+            'professor': 1,
+            'coordenador': 2,
+            'aluno': 3,
+            'secretaria': 4,
+            'administrador': 5
+        };
 
-            const data = await response.json();
+        const tipo_id = mapaCadastro[tipoConta];
+        if (!tipo_id) {
+            alert("⚠️ Selecione o Tipo de Conta.");
+            return;
+        }
 
-            if (response.ok) {
-                alert("✅ Cadastro realizado com sucesso!");
-                window.location.href = 'login.html';
-            } else {
-                alert("❌ Erro no cadastro: " + (data.error || "Tente novamente"));
-            }
-        } catch (error) {
-            alert("⚠️ Erro de conexão com o servidor.");
-        }
-    });
+        try {
+            const response = await fetch(`${API_URL}/cadastro`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, email, matricula, senha, tipo_id })
+            });
+
+            if (response.ok) {
+                alert("✅ Cadastro realizado com sucesso!");
+                window.location.href = 'login.html';
+            } else {
+                const data = await response.json();
+                alert("❌ Erro no cadastro: " + (data.error || "Verifique os dados."));
+            }
+        } catch (error) {
+            console.error("Erro na conexão:", error);
+            alert("⚠️ Erro de conexão com o servidor.");
+        }
+    });
 }
 
 /* ============================================================
-   LÓGICA DO DASHBOARD (Contadores Dinâmicos)
-   ============================================================ */
-
+   DASHBOARD E UI
+   ============================================================ */
+/* ============================================================
+   DASHBOARD - ATUALIZAÇÃO GERAL E ESTILIZAÇÃO
+   ============================================================ */
 async function atualizarDashboardGeral() {
-    const agora = new Date();
-    const hojeDataFormatada = agora.toISOString().split('T')[0];
-    const diasSemana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-    const hojeDiaNome = diasSemana[agora.getDay()];
+    const aulas = JSON.parse(localStorage.getItem('minhasAulas')) || [];
+    const reunioes = JSON.parse(localStorage.getItem('minhasReunioes')) || [];
+    const eventos = JSON.parse(localStorage.getItem('eventos_db')) || [];
 
-    // Dados locais (Aulas, Reuniões, Eventos)
-    const aulas = JSON.parse(localStorage.getItem('minhasAulas')) || [];
-    const reunioes = JSON.parse(localStorage.getItem('minhasReunioes')) || [];
-    const eventos = JSON.parse(localStorage.getItem('eventos_db')) || [];
+    const aplicarEstiloCard = (idElemento, valor) => {
+        const elemento = document.getElementById(idElemento);
+        if (!elemento) return;
 
-    const aplicarEstiloCard = (idElemento, valor) => {
-        const elemento = document.getElementById(idElemento);
-        if (!elemento) return;
-        const statusLabel = elemento.parentElement;
-        
-        // Garante que o número dentro do círculo seja sempre branco
-        elemento.style.color = 'white';
-        elemento.style.fontWeight = 'bold';
+        elemento.textContent = valor;
+        
+        // Estilização do número para garantir visibilidade
+        elemento.style.color = '#1a1a1a'; 
+        elemento.style.fontWeight = '800';
 
-        if (valor > 0) {
-            statusLabel.style.backgroundColor = '#e9f5ee'; 
-            statusLabel.style.color = '#2d7a4d';           
-            elemento.style.backgroundColor = '#2d7a4d';    
-        } else {
-            statusLabel.style.backgroundColor = '#f1f5f9'; 
-            statusLabel.style.color = '#64748b';
-            // Cinza médio para manter contraste com o número branco
-            elemento.style.backgroundColor = '#94a3b8';
-        }
-        elemento.textContent = valor;
-    };
-    
-    // Contadores Locais
-    aplicarEstiloCard('count-aulas', aulas.length);
-    aplicarEstiloCard('count-reunioes', reunioes.filter(r => !r.concluida).length);
-    aplicarEstiloCard('count-eventos-total', eventos.length);
+        // CORREÇÃO AQUI: O seletor deve ser .dash-card, conforme seu HTML
+        const cardContainer = elemento.closest('.dash-card');
+        
+        if (cardContainer) {
+            if (valor > 0) {
+                // Estilo de destaque (Verde)
+                cardContainer.style.backgroundColor = '#e9f5ee'; 
+                cardContainer.style.borderLeft = '5px solid #2d7a50';
+            } else {
+                // Estilo neutro (Cinza)
+                cardContainer.style.backgroundColor = '#f8fafc';
+                cardContainer.style.borderLeft = '5px solid #e2e8f0';
+            }
+        }
+    };
+    
+    // Chamadas das funções
+    aplicarEstiloCard('count-aulas', aulas.length);
+    aplicarEstiloCard('count-reunioes', reunioes.filter(r => !r.concluida).length);
+    aplicarEstiloCard('count-eventos-total', eventos.length);
+    // Adicionei o count-horarios para bater com seu HTML
+    aplicarEstiloCard('count-horarios', 0); 
 
-    // Contador de Usuários (Dinâmico via API)
-    const contadorUsuarios = document.getElementById('total-usuarios');
-    if (contadorUsuarios) {
-        try {
-            const res = await fetch(`${API_URL}/api/usuarios`);
-            if (res.ok) {
-                const lista = await res.json();
-                aplicarEstiloCard('total-usuarios', lista.length);
-            }
-        } catch (err) {
-            console.error("Erro ao buscar usuários:", err);
-        }
-    }
-
-    const totalHoje = aulas.filter(a => a.dia.includes(hojeDiaNome)).length +
-                      reunioes.filter(r => r.data === hojeDataFormatada && !r.concluida).length +
-                      eventos.filter(e => e.data === hojeDataFormatada).length;
-    
-    aplicarEstiloCard('count-horarios', totalHoje);
+    if (document.getElementById('total-usuarios')) {
+        try {
+            const res = await fetch(`${API_URL}/api/usuarios`);
+            if (res.ok) {
+                const lista = await res.json();
+                aplicarEstiloCard('total-usuarios', lista.length);
+            }
+        } catch (err) { console.error(err); }
+    }
 }
 
-// Inicialização e Listeners
+/* ============================================================
+   DASHBOARD E UI
+   ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Atualiza nome do usuário
-    const userNameDisplay = document.getElementById('user-name');
-    if (userNameDisplay) {
-        userNameDisplay.textContent = localStorage.getItem('usuarioNome') || "Usuário";
-    }
+    // 1. Puxar o usuário logado via Auth.js
+    const user = Auth.getUsuarioLogado();
+    const userNameDisplay = document.getElementById('user-name');
+    
+    // Se o elemento no seu HTML for o <h1> que diz "Bem-vindo... Usuário!", 
+    // certifique-se de que ele tem o id="user-name" ou ajuste aqui:
+    if (user && userNameDisplay) {
+        userNameDisplay.textContent = user.nome;
+    }
 
-    // 2. Executa contadores do Dashboard
-    atualizarDashboardGeral();
+    // 2. Configurar o botão de Sair (Logout)
+    const btnSair = document.querySelector('.btn-logout') || document.getElementById('btn-sair');
+    if (btnSair) {
+        btnSair.addEventListener('click', (e) => {
+            e.preventDefault();
+            Auth.logout(); // Usa a função centralizada no auth.js
+        });
+    }
+    
+    atualizarDashboardGeral();
 });
 
-window.addEventListener('focus', () => {
-    atualizarDashboardGeral();
-});
+function togglePassword(inputId) {
+    const passInput = document.getElementById(inputId);
+    if (!passInput) return;
+    passInput.type = passInput.type === 'password' ? 'text' : 'password';
+}

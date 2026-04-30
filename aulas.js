@@ -1,162 +1,198 @@
-/* ============================================================
-   1. DADOS E PERSISTÊNCIA (LocalStorage)
-   ============================================================ */
+// aulas.js - Mude o início para isto:
+if (typeof API_URL === 'undefined') {
+    window.API_URL = "https://projeto-dac-production.up.railway.app";
+}
 
-// Tenta carregar do LocalStorage. Se não existir, começa com o array vazio.
-let minhasAulas = JSON.parse(localStorage.getItem('minhasAulas')) || [];
+let minhasAulas = []; 
+let aulaEmEdicaoId = null; 
 
-// Variável de controle de visão (Professor/Aluno)
-let visaoAtual = 'professor'; 
+function obterUsuarioLogado() {
+    const usuario = localStorage.getItem('usuarioLogado');
+    return usuario ? JSON.parse(usuario) : null;
+}
 
-// Função auxiliar para salvar no navegador
-function salvarNoLocalStorage() {
-    localStorage.setItem('minhasAulas', JSON.stringify(minhasAulas));
+function ehAdmin() {
+    const userJson = localStorage.getItem('usuarioLogado');
+    const tipoDireto = localStorage.getItem('usuarioTipo'); 
+
+    if (userJson) {
+        const user = JSON.parse(userJson);
+        // Wesley (Admin) tem tipo 5 no seu LocalStorage
+        if (user.tipo == 5 || user.usuarioTipo == 5 || tipoDireto == 5) {
+            return true;
+        }
+    }
+    return tipoDireto == 5;
 }
 
 /* ============================================================
-   2. CONTROLE DO MODAL (ABRIR / FECHAR)
+   2. COMUNICAÇÃO COM O BACKEND (FETCH)
+   ============================================================ */
+
+async function carregarAulasDoBanco() {
+    try {
+        const response = await fetch(`${API_URL}/api/agenda/aulas`); // Ajuste para sua rota completa
+        if (!response.ok) throw new Error('Erro ao buscar aulas');
+        
+        minhasAulas = await response.json();
+        renderizarTabela();
+    } catch (error) {
+        console.error("❌ Erro ao carregar banco:", error);
+        // Fallback para LocalStorage se o Railway estiver fora ou demorar
+        minhasAulas = JSON.parse(localStorage.getItem('minhasAulas')) || [];
+        renderizarTabela();
+    }
+}
+
+async function excluirAula(id) {
+    if (!confirm('Tem certeza que deseja remover esta aula?')) return;
+
+    try {
+        const response = await fetch(`${API_URL}/api/agenda/aulas/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            await carregarAulasDoBanco(); 
+        } else {
+            alert("Erro ao excluir aula no servidor.");
+        }
+    } catch (error) {
+        console.error("Erro na exclusão:", error);
+    }
+}
+
+/* ============================================================
+   3. CONTROLE DO MODAL E TABELA
    ============================================================ */
 const modal = document.getElementById('modalAula');
-const btnNovaAula = document.querySelector('.btn-nova-aula');
-const btnCancelar = document.getElementById('btnCancelar');
-const btnFecharX = document.querySelector('.close-modal');
-
-if (btnNovaAula) {
-    btnNovaAula.onclick = () => {
-        modal.style.display = 'block';
-    };
-}
-
-const fecharModal = () => {
-    modal.style.display = 'none';
-    const form = document.getElementById('formAula');
-    if (form) form.reset(); 
-};
-
-if (btnCancelar) btnCancelar.onclick = fecharModal;
-if (btnFecharX) btnFecharX.onclick = fecharModal;
-
-window.onclick = (event) => {
-    if (event.target == modal) fecharModal();
-};
-
-/* ============================================================
-   3. GERENCIAMENTO DA TABELA E VISÕES
-   ============================================================ */
-
-function alternarVisao(tipo) {
-    visaoAtual = tipo;
-
-    document.getElementById('btn-view-professor').classList.toggle('active', tipo === 'professor');
-    document.getElementById('btn-view-aluno').classList.toggle('active', tipo === 'aluno');
-
-    const btnNova = document.querySelector('.btn-nova-aula');
-    if (btnNova) {
-        btnNova.style.display = (tipo === 'professor') ? 'block' : 'none';
-    }
-
-    renderizarTabela();
-}
+const btnNovaAula = document.getElementById('btnAbrirModalAula');
+const tituloModal = document.querySelector('.modal-header h2');
 
 function renderizarTabela() {
     const corpoTabela = document.getElementById('lista-aulas');
-    const thAcoes = document.querySelector('th:last-child'); 
+    const adminMode = ehAdmin();
     
     if (!corpoTabela) return;
-
-    if (thAcoes) {
-        thAcoes.style.display = (visaoAtual === 'professor') ? 'table-cell' : 'none';
+    
+    // Libera o botão "Nova Aula" se for Admin
+    if (btnNovaAula) {
+        btnNovaAula.style.display = adminMode ? 'block' : 'none';
     }
 
     corpoTabela.innerHTML = '';
 
     minhasAulas.forEach((aula) => {
         const tr = document.createElement('tr');
-        
-        let htmlConteudo = `
+        tr.innerHTML = `
             <td><strong>${aula.disciplina}</strong></td>
             <td><span class="badge-turma">${aula.turma}</span></td>
             <td>${aula.sala}</td>
             <td>${aula.dia}</td>
             <td>${aula.horario}</td>
-        `;
-
-        if (visaoAtual === 'professor') {
-            htmlConteudo += `
-                <td style="text-align: right;">
-                    <button class="btn-action" title="Visualizar"><i class="fa-regular fa-eye"></i></button>
+            <td style="text-align: right;">
+                ${adminMode ? `
+                    <button class="btn-action" onclick="prepararEdicao(${aula.id})" title="Editar">
+                        <i class="fa-regular fa-pen-to-square"></i>
+                    </button>
                     <button class="btn-action btn-delete" onclick="excluirAula(${aula.id})" title="Excluir">
                         <i class="fa-regular fa-trash-can"></i>
                     </button>
-                </td>
-            `;
-        }
-
-        tr.innerHTML = htmlConteudo;
+                ` : '---'}
+            </td>
+        `;
         corpoTabela.appendChild(tr);
     });
 }
 
-/* ============================================================
-   4. FORMULÁRIO E AUXILIARES
-   ============================================================ */
+function prepararEdicao(id) {
+    const aula = minhasAulas.find(a => a.id === id);
+    if (!aula) return;
 
+    aulaEmEdicaoId = id;
+    tituloModal.innerText = "Editar Aula";
+
+    document.getElementById('materia').value = aula.disciplina;
+    document.getElementById('turma').value = aula.turma;
+    document.getElementById('sala').value = aula.sala;
+    document.getElementById('diaSemana').value = aula.dia;
+    
+    const [inicio, termino] = aula.horario.split(' - ');
+    document.getElementById('horarioInicio').value = inicio;
+    document.getElementById('horarioTermino').value = termino;
+
+    modal.style.display = 'block';
+}
+
+const fecharModal = () => {
+    modal.style.display = 'none';
+    const form = document.getElementById('formAula');
+    if (form) form.reset();
+    aulaEmEdicaoId = null;
+};
+
+/* ============================================================
+   4. ENVIO DO FORMULÁRIO (INSERT/UPDATE)
+   ============================================================ */
 const formAula = document.getElementById('formAula');
 if (formAula) {
-    formAula.onsubmit = (e) => {
+    formAula.onsubmit = async (e) => {
         e.preventDefault();
+        const user = obterUsuarioLogado();
 
-        const horaInicio = document.getElementById('horarioInicio').value;
-        const horaTermino = document.getElementById('horarioTermino').value;
-
-        const novaAula = {
-            id: Date.now(),
-            tipo: 'aula', // <--- IMPORTANTE: Prepara para a tela de Horários identificar como Aula
+        const dadosAula = {
             disciplina: document.getElementById('materia').value,
             turma: document.getElementById('turma').value,
             sala: document.getElementById('sala').value,
             dia: document.getElementById('diaSemana').value,
-            horario: `${horaInicio} - ${horaTermino}`
+            horario: `${document.getElementById('horarioInicio').value} - ${document.getElementById('horarioTermino').value}`,
+            idUsuario: user ? user.id : null,
+            idTipo: 1 
         };
 
-        minhasAulas.push(novaAula);
-        salvarNoLocalStorage();
-        renderizarTabela();
-        fecharModal();
+        const url = aulaEmEdicaoId ? `${API_URL}/api/agenda/aulas/${aulaEmEdicaoId}` : `${API_URL}/api/agenda/aulas`;
+        const method = aulaEmEdicaoId ? 'PUT' : 'POST';
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dadosAula)
+            });
+
+            if (response.ok) {
+                fecharModal();
+                await carregarAulasDoBanco();
+            } else {
+                alert("Erro ao salvar dados no servidor.");
+            }
+        } catch (error) {
+            console.error("Erro na conexão:", error);
+            alert("Erro ao conectar com o servidor.");
+        }
     };
 }
 
-function excluirAula(id) {
-    if (confirm('Tem certeza que deseja remover esta aula?')) {
-        minhasAulas = minhasAulas.filter(aula => aula.id !== id);
-        salvarNoLocalStorage();
-        renderizarTabela();
+/* ============================================================
+   5. INICIALIZAÇÃO E EVENTOS
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+    // Carrega os dados iniciais
+    carregarAulasDoBanco();
+
+    // Atribui evento ao botão de abrir modal (Garante que funcione mesmo com erro de API)
+    if (btnNovaAula) {
+        btnNovaAula.onclick = () => {
+            aulaEmEdicaoId = null;
+            tituloModal.innerText = "Nova Aula";
+            modal.style.display = 'block';
+        };
     }
-}
 
-function preencherHorarios() {
-    const selects = [document.getElementById('horarioInicio'), document.getElementById('horarioTermino')];
-    
-    selects.forEach(select => {
-        if (!select) return;
-        select.innerHTML = '<option value="">--:--</option>';
-        
-        for (let hora = 7; hora <= 22; hora++) {
-            ["00", "15", "30", "45"].forEach(minuto => {
-                const h = hora < 10 ? `0${hora}` : hora;
-                const valor = `${h}:${minuto}`;
-                const option = new Option(valor, valor);
-                select.add(option);
-            });
-        }
-    });
-}
+    // Atribui botões de fechar
+    const btnCancelar = document.getElementById('btnCancelar');
+    const btnFecharX = document.querySelector('.close-modal');
 
-document.addEventListener('DOMContentLoaded', () => {
-    preencherHorarios();
-    renderizarTabela();
-});
-document.addEventListener('DOMContentLoaded', () => {
-    // Isso garante que, ao entrar na tela, a visão de professor seja carregada
-    alternarVisao('professor'); 
+    if (btnCancelar) btnCancelar.onclick = fecharModal;
+    if (btnFecharX) btnFecharX.onclick = fecharModal;
 });

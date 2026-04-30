@@ -150,6 +150,92 @@ app.get('/api/usuarios/:id', (req, res) => {
 });
 
 /* ============================================================
+   ROTAS DE AGENDA (AULAS) - OPÇÃO 2
+   ============================================================ */
+
+// 1. CADASTRAR AULA
+app.post('/api/agenda/aulas', (req, res) => {
+    const { disciplina, turma, sala, dia, horario, idUsuario, idTipo } = req.body;
+    
+    // Tratamento para separar o horário (Ex: "19:00 - 21:30")
+    const [inicio, fim] = horario.split(' - ');
+
+    const sql = `
+        INSERT INTO tbAgenda 
+        (disciplina, turma, sala, dia_semana, hora_inicio, hora_fim, usuario_id, tipo_agenda_id, status) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'ativo')`;
+    
+    db.query(sql, [disciplina, turma, sala, dia, inicio, fim, idUsuario, idTipo], (err, result) => {
+        if (err) {
+            console.error("❌ Erro ao inserir aula:", err.message);
+            return res.status(500).json({ error: "Erro interno no servidor" });
+        }
+        res.status(201).json({ message: "Aula criada!", id: result.insertId });
+    });
+});
+
+//* ============================================================
+   
+// Garanta que o caminho comece exatamente com /api/agenda/aulas
+app.get('/api/agenda/aulas', (req, res) => {
+    console.log("📢 Buscando aulas no banco de dados...");
+    
+    // Filtramos pelo tipo_agenda_id = 1 (Aulas Teóricas)
+    const sql = "SELECT * FROM tbAgenda WHERE tipo_agenda_id = 1 ORDER BY id DESC";
+    
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("❌ Erro SQL ao listar aulas:", err.message);
+            return res.status(500).json({ error: "Erro ao buscar dados no banco" });
+        }
+        
+        // Mapeamos os nomes das colunas do banco para o padrão do seu frontend
+        const formatado = results.map(aula => ({
+            id: aula.id,
+            disciplina: aula.disciplina,
+            turma: aula.turma,
+            sala: aula.sala,
+            dia: aula.dia_semana, // Mapeia dia_semana do banco para 'dia' do front
+            horario: `${aula.hora_inicio} - ${aula.hora_fim}` // Recria a string de horário
+        }));
+        
+        console.log(`✅ ${formatado.length} aulas encontradas e enviadas.`);
+        res.json(formatado);
+    });
+});
+
+// 3. EDITAR AULA
+app.put('/api/agenda/aulas/:id', (req, res) => {
+    const { id } = req.params;
+    const { disciplina, turma, sala, dia, horario } = req.body;
+    const [inicio, fim] = horario.split(' - ');
+
+    const sql = `
+        UPDATE tbAgenda 
+        SET disciplina = ?, turma = ?, sala = ?, dia_semana = ?, hora_inicio = ?, hora_fim = ? 
+        WHERE id = ?`;
+    
+    db.query(sql, [disciplina, turma, sala, dia, inicio, fim, id], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: "Aula atualizada com sucesso!" });
+    });
+});
+
+// 4. EXCLUIR AULA
+app.delete('/api/agenda/aulas/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = "DELETE FROM tbAgenda WHERE id = ?";
+
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error('❌ Erro no DELETE da aula:', err.message);
+            return res.status(500).json({ error: "Erro ao excluir aula no banco" });
+        }
+        res.status(200).json({ message: "Sucesso" });
+    });
+});
+
+/* ============================================================
    INICIALIZAÇÃO
    ============================================================ */
 const PORT = process.env.PORT || 3000;

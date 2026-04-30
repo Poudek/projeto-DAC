@@ -15,6 +15,7 @@ getUsuarioLogado() {
     // Verifica se o usuário está logado e tem o cargo necessário
     validarAcesso(cargoRequerido = null) {
         const usuario = this.getUsuarioLogado();
+        const tipoDireto = localStorage.getItem('usuarioTipo');
 
         // 1. Se não estiver logado, manda pro login
         if (!usuario) {
@@ -24,15 +25,18 @@ getUsuarioLogado() {
 
         // 2. Se exigir um cargo específico (ex: administrador)
         if (cargoRequerido) {
-            const cargoAtual = (usuario.cargo || "").toLowerCase();
-            if (cargoAtual !== cargoRequerido.toLowerCase()) {
-                alert("Acesso negado! Você não tem permissão para acessar esta área.");
-                window.location.href = 'dashboard.html';
-                return false;
-            }
+        const cargoAtual = (usuario.cargo || "").toLowerCase();
+        // Ajuste: Verifica por nome OU pelo ID de tipo (5 = Admin)
+        const ehAdmin = cargoAtual === 'administrador' || usuario.tipo_id == 5 || tipoDireto == 5;
+        
+        if (cargoRequerido.toLowerCase() === 'administrador' && !ehAdmin) {
+            alert("Acesso negado!");
+            window.location.href = 'dashboard.html';
+            return false;
         }
-        return true;
-    },
+    }
+    return true;
+},
 
     // Remove os dados e desloga o usuário
     logout() {
@@ -58,3 +62,4 @@ function gerenciarMenuLateral() {
 
 // Executa assim que a página carregar
 document.addEventListener('DOMContentLoaded', gerenciarMenuLateral);
+window.Auth = Auth; // Garante que script.js e aulas.js o enxerguem

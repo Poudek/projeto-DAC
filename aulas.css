@@ -105,7 +105,7 @@ body {
 
 .top-actions {
     display: flex;             /* Ativa o modo flexível */
-    justify-content: space-between; /* Empurra um para cada lado */
+    justify-content: right; /* Empurra um para cada lado */
     align-items: center;       /* Alinha os dois verticalmente pelo centro */
     margin-bottom: 30px;       /* Espaço entre essa barra e a tabela */
     width: 100%;               /* Garante que use a largura total */

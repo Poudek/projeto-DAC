@@ -154,23 +154,29 @@ app.get('/api/usuarios/:id', (req, res) => {
    ============================================================ */
 
 // 1. CADASTRAR AULA
+// server.js - Rota de Cadastro de Aula atualizada
 app.post('/api/agenda/aulas', (req, res) => {
     const { disciplina, turma, sala, dia, horario, idUsuario, idTipo } = req.body;
     
-    // Tratamento para separar o horário (Ex: "19:00 - 21:30")
+    if (!horario || !horario.includes(' - ')) {
+        return res.status(400).json({ error: "Horário inválido" });
+    }
+
     const [inicio, fim] = horario.split(' - ');
 
+    // Adicionamos 'titulo' no INSERT para resolver o erro do log
     const sql = `
         INSERT INTO tbAgenda 
-        (disciplina, turma, sala, dia_semana, hora_inicio, hora_fim, usuario_id, tipo_agenda_id, status) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'ativo')`;
+        (titulo, disciplina, turma, sala, dia_semana, hora_inicio, hora_fim, usuario_id, tipo_agenda_id, status) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'ativo')`;
     
-    db.query(sql, [disciplina, turma, sala, dia, inicio, fim, idUsuario, idTipo], (err, result) => {
+    // Passamos 'disciplina' duas vezes: uma para o campo titulo e outra para disciplina
+    db.query(sql, [disciplina, disciplina, turma, sala, dia, inicio, fim, idUsuario, idTipo], (err, result) => {
         if (err) {
             console.error("❌ Erro ao inserir aula:", err.message);
-            return res.status(500).json({ error: "Erro interno no servidor" });
+            return res.status(500).json({ error: err.message });
         }
-        res.status(201).json({ message: "Aula criada!", id: result.insertId });
+        res.status(201).json({ message: "Sucesso", id: result.insertId });
     });
 });
 

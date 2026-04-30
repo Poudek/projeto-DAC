@@ -178,7 +178,19 @@ if (cadastroForm) {
    DASHBOARD - ATUALIZAÇÃO GERAL E ESTILIZAÇÃO
    ============================================================ */
 async function atualizarDashboardGeral() {
-    const aulas = JSON.parse(localStorage.getItem('minhasAulas')) || [];
+    // 1. Buscamos as aulas da API em vez do LocalStorage
+    let totalAulas = 0;
+    try {
+        const resAulas = await fetch(`${API_URL}/api/agenda/aulas`);
+        if (resAulas.ok) {
+            const listaAulas = await resAulas.json();
+            totalAulas = listaAulas.length;
+        }
+    } catch (err) {
+        console.error("Erro ao buscar aulas para o dashboard:", err);
+    }
+
+    // Mantemos os outros (por enquanto) no LocalStorage ou migre conforme necessário
     const reunioes = JSON.parse(localStorage.getItem('minhasReunioes')) || [];
     const eventos = JSON.parse(localStorage.getItem('eventos_db')) || [];
 
@@ -187,34 +199,28 @@ async function atualizarDashboardGeral() {
         if (!elemento) return;
 
         elemento.textContent = valor;
-        
-        // Estilização do número para garantir visibilidade
         elemento.style.color = '#1a1a1a'; 
         elemento.style.fontWeight = '800';
 
-        // CORREÇÃO AQUI: O seletor deve ser .dash-card, conforme seu HTML
         const cardContainer = elemento.closest('.dash-card');
-        
         if (cardContainer) {
             if (valor > 0) {
-                // Estilo de destaque (Verde)
                 cardContainer.style.backgroundColor = '#e9f5ee'; 
                 cardContainer.style.borderLeft = '5px solid #2d7a50';
             } else {
-                // Estilo neutro (Cinza)
                 cardContainer.style.backgroundColor = '#f8fafc';
                 cardContainer.style.borderLeft = '5px solid #e2e8f0';
             }
         }
     };
     
-    // Chamadas das funções
-    aplicarEstiloCard('count-aulas', aulas.length);
+    // 2. Aplicamos o valor vindo da API
+    aplicarEstiloCard('count-aulas', totalAulas);
     aplicarEstiloCard('count-reunioes', reunioes.filter(r => !r.concluida).length);
     aplicarEstiloCard('count-eventos-total', eventos.length);
-    // Adicionei o count-horarios para bater com seu HTML
     aplicarEstiloCard('count-horarios', 0); 
 
+    // Bloco de usuários (já estava correto buscando da API)
     if (document.getElementById('total-usuarios')) {
         try {
             const res = await fetch(`${API_URL}/api/usuarios`);

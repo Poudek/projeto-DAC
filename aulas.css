@@ -226,7 +226,16 @@ body {
 
 /* Botões do Rodapé */
 .modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
-.btn-cancelar { background: #eee; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+
+.btn-cancelar { 
+    background: #eee; 
+    border: none; 
+    padding: 12px 20px; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-weight: 600; 
+}
+
 .btn-salvar { 
     background: #1a7b45; 
     color: white; 
@@ -238,4 +247,24 @@ body {
 }
 .btn-salvar:hover {
     filter: brightness(0.9);
+}
+
+/* Efeito de destaque nas linhas da agenda de aulas */
+.table-card tbody tr {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-left: 4px solid transparent; /* Reserva o espaço para a borda não "empurrar" o texto */
+}
+
+.table-card tbody tr:hover {
+    background-color: rgba(39, 174, 96, 0.05); /* O mesmo verde suave do admin */
+    border-left: 4px solid #27ae60; /* Borda lateral sólida no hover */
+    transform: translateX(5px); /* Desloca levemente para a direita em vez de dar zoom */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Garante que os botões de ação também fiquem nítidos */
+.table-card tbody tr:hover .btn-acao-tabela {
+    transform: scale(1.1);
+    color: #27ae60;
 }

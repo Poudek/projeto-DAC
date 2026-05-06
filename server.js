@@ -241,6 +241,30 @@ app.delete('/api/agenda/aulas/:id', (req, res) => {
     });
 });
 
+// --- ROTA PARA SALVAR EVENTO NO BANCO ---
+app.post('/api/eventos', (req, res) => {
+    const { titulo, categoria, data, hora_inicio, local, descricao, usuario_id } = req.body;
+    
+    const sql = "INSERT INTO tbEventos (titulo, categoria, data, hora_inicio, local, descricao, usuario_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    
+    db.query(sql, [titulo, categoria, data, hora_inicio, local, descricao, usuario_id], (err, result) => {
+        if (err) {
+            console.error("Erro SQL:", err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.status(201).json({ message: "Evento criado com sucesso!" });
+    });
+});
+
+// --- ROTA PARA BUSCAR EVENTOS ---
+app.get('/api/eventos', (req, res) => {
+    const sql = "SELECT * FROM tbEventos ORDER BY data ASC, hora_inicio ASC";
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(results);
+    });
+});
+
 /* ============================================================
    INICIALIZAÇÃO
    ============================================================ */

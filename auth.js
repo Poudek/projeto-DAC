@@ -12,16 +12,20 @@ getUsuarioLogado() {
     return user;
 },
 
-    // Verifica se o usuário está logado e tem o cargo necessário
     validarAcesso(cargoRequerido = null) {
-        const usuario = this.getUsuarioLogado();
-        const tipoDireto = localStorage.getItem('usuarioTipo');
+    // NOVA REGRA: Se estiver na página de cadastro, não valida nada
+    if (window.location.pathname.includes('cadastro.html')) {
+        return true; 
+    }
 
-        // 1. Se não estiver logado, manda pro login
-        if (!usuario) {
-            window.location.href = 'index.html'; // ou login.html
-            return false;
-        }
+    const usuario = this.getUsuarioLogado();
+    const tipoDireto = localStorage.getItem('usuarioTipo');
+
+    // 1. Se não estiver logado, manda pro login
+    if (!usuario) {
+        window.location.href = 'index.html';
+        return false;
+    }
 
         // 2. Se exigir um cargo específico (ex: administrador)
         if (cargoRequerido) {

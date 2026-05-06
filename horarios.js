@@ -1,9 +1,33 @@
 let dataReferencia = new Date(); 
+let todasAsAulasAPI = []; 
+let todosEventosAPI = []; // 1. Adicionada variável para Eventos da API
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicializa a semana e o dia atual
-    atualizarSemana(); 
+    const lista = document.getElementById('lista-agenda');
+    if (lista) lista.innerHTML = '<p style="text-align:center; color:#a0aec0; margin-top:20px;">Carregando agenda...</p>';
+
+    carregarDadosAPI(); // 2. Chamada unificada
 });
+
+/* ============================================================
+   BUSCA UNIFICADA (AULAS + EVENTOS)
+   ============================================================ */
+async function carregarDadosAPI() {
+    try {
+        // Busca ambos simultaneamente para ganhar performance
+        const [resAulas, resEventos] = await Promise.all([
+            fetch(`${API_URL}/api/agenda/aulas`),
+            fetch(`${API_URL}/api/eventos`) // Rota que vamos criar no server.js
+        ]);
+
+        if (resAulas.ok) todasAsAulasAPI = await resAulas.json();
+        if (resEventos.ok) todosEventosAPI = await resEventos.json();
+
+    } catch (error) {
+        console.error("Erro ao buscar dados da API:", error);
+    }
+    atualizarSemana(); 
+}
 
 /* ============================================================
    1. ATUALIZAÇÃO DO TEXTO DA DATA SELECIONADA
@@ -15,20 +39,18 @@ function atualizarTextoDataDestaque(dataObjeto) {
     const opcoes = { weekday: 'long', day: '2-digit', month: 'long' };
     let dataFormatada = dataObjeto.toLocaleDateString('pt-BR', opcoes);
 
-    // Formata para: TERÇA-FEIRA, 28 DE ABRIL
     dataFormatada = dataFormatada.replace('-feira', '-FEIRA').toUpperCase();
     elementoData.innerText = dataFormatada;
 }
 
 /* ============================================================
-   2. CONTROLE DA SEMANA
+   2. CONTROLE DA SEMANA (ESTÁVEL)
    ============================================================ */
 function atualizarSemana() {
     const diasCards = document.querySelectorAll('.day-card');
     const labelSemana = document.querySelector('.current-week');
     if (!diasCards.length) return;
 
-    // Calcula a segunda-feira da semana de referência
     const dataAux = new Date(dataReferencia);
     const diaDaSemana = dataAux.getDay(); 
     const diferencaParaSegunda = diaDaSemana === 0 ? -6 : 1 - diaDaSemana;
@@ -59,13 +81,9 @@ function atualizarSemana() {
             numeroTag.textContent = diaNumero < 10 ? `0${diaNumero}` : diaNumero;
         }
 
-        // Criamos uma cópia da data para o escopo do clique
         const dataParaClique = new Date(dataDia);
-
-        // Configura o clique manual
         card.onclick = () => selecionarDia(card, diaNome, dataParaClique);
         
-        // Verifica se é hoje
         if (dataDia.toDateString() === hojeReal.toDateString()) {
             card.classList.add('today-highlight');
             cardParaAtivar = { elemento: card, nome: diaNome, data: dataParaClique };
@@ -74,7 +92,6 @@ function atualizarSemana() {
         }
     });
 
-    // Ativação automática ao carregar ou mudar de semana
     if (cardParaAtivar) {
         selecionarDia(cardParaAtivar.elemento, cardParaAtivar.nome, cardParaAtivar.data);
     } else if (diasCards.length > 0) {
@@ -94,14 +111,12 @@ function semanaAnterior() {
 }
 
 /* ============================================================
-   3. SELEÇÃO E FILTRAGEM
+   3. SELEÇÃO E FILTRAGEM (AJUSTADO PARA API)
    ============================================================ */
 function selecionarDia(elemento, diaNome, dataObjeto) {
-    // Interface
     document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
     elemento.classList.add('active');
 
-    // Limpeza e Atualização
     const lista = document.getElementById('lista-agenda');
     if (lista) lista.innerHTML = '';
 
@@ -113,37 +128,47 @@ function renderizarAgendaPorDia(diaSemana, dataObjeto) {
     const lista = document.getElementById('lista-agenda');
     if (!lista) return;
 
-    const aulas = JSON.parse(localStorage.getItem('minhasAulas')) || [];
+    const aulas = todasAsAulasAPI; 
+    const eventos = todosEventosAPI; // 3. Agora os eventos vêm da API
     const reunioes = JSON.parse(localStorage.getItem('minhasReunioes')) || [];
-    const eventos = JSON.parse(localStorage.getItem('eventos_db')) || [];
 
     const diaStr = dataObjeto.getDate().toString().padStart(2, '0');
     const mesStr = (dataObjeto.getMonth() + 1).toString().padStart(2, '0');
     const anoStr = dataObjeto.getFullYear();
-    
-    const dataCompletaISO = `${anoStr}-${mesStr}-${diaStr}`; // AAAA-MM-DD
+    const dataCompletaISO = `${anoStr}-${mesStr}-${diaStr}`;
 
-    // Filtros
-    const aulasFiltradas = aulas.filter(a => a.dia.toLowerCase().includes(diaSemana.toLowerCase()));
+    // Filtro de Aulas (Por Nome do Dia)
+    const aulasFiltradas = aulas.filter(a => 
+        a.dia.toLowerCase().includes(diaSemana.toLowerCase())
+    );
     
-    const reunioesFiltradas = reunioes.filter(r => {
-        // Aceita formatos AAAA-MM-DD ou apenas DD/MM se o ano for omitido
-        return (r.data === dataCompletaISO || r.data.includes(`${diaStr}/${mesStr}`)) && !r.concluida;
+    // Filtro de Eventos (Por Data Exata)
+    const eventosFiltrados = eventos.filter(e => {
+        // Trata a data da API (remove o T00:00:00.000Z se houver)
+        const dataEvento = e.data.split('T')[0];
+        return dataEvento === dataCompletaISO;
     });
 
-    const eventosFiltrados = eventos.filter(e => e.data.includes(`${mesStr}-${diaStr}`) || e.data === dataCompletaISO);
+    const reunioesFiltradas = reunioes.filter(r => {
+        return (r.data === dataCompletaISO || r.data.includes(`${diaStr}/${mesStr}`)) && !r.concluida;
+    });
 
     if (aulasFiltradas.length === 0 && reunioesFiltradas.length === 0 && eventosFiltrados.length === 0) {
         lista.innerHTML = '<p style="text-align:center; color:#a0aec0; margin-top:20px;">Nenhuma atividade para este dia.</p>';
         return;
     }
 
-    // Renderização organizada por tipo
-    eventosFiltrados.forEach(item => criarItem(lista, item.inicio, item.categoria, `Evento: ${item.categoria}`, item.titulo, item.local, 'evento', 'fa-calendar-check'));
+    // Renderização
+    eventosFiltrados.forEach(item => {
+        // Ajustamos os nomes das propriedades conforme o banco de dados
+        criarItem(lista, item.hora_inicio, '', item.categoria, `Evento: ${item.titulo}`, item.local, 'evento', 'fa-calendar-check');
+    });
+
     reunioesFiltradas.forEach(item => criarItem(lista, item.horario, 'Reunião', 'Reunião', item.titulo, item.local, 'reuniao', 'fa-users'));
+    
     aulasFiltradas.forEach(item => {
-        const horas = item.horario.split(' - ');
-        criarItem(lista, horas[0], horas[1] || '', 'Aula', `${item.disciplina} - ${item.turma}`, item.sala, 'aula', 'fa-book-open');
+        const horas = item.horario.includes(' - ') ? item.horario.split(' - ') : [item.horario, ''];
+        criarItem(lista, horas[0], horas[1], 'Aula', `${item.disciplina} - ${item.turma}`, item.sala, 'aula', 'fa-book-open');
     });
 }
 

@@ -17,6 +17,10 @@ const dom = {
     senha: document.getElementById('senhaUsuario'),
     toggle: document.getElementById('toggleSenha')
 };
+const inputMatricula = document.getElementById('matriculaUsuario');
+    if (inputMatricula) {
+        inputMatricula.addEventListener('input', aplicarMascaraMatricula);
+    }
 
 /* ============================================================
    INICIALIZAÇÃO
@@ -301,4 +305,20 @@ function configurarToggleSenha() {
             dom.toggle.classList.toggle('fa-eye-slash');
         };
     }
+}
+
+/* ============================================================
+   MÁSCARA DE MATRÍCULA (PADRÃO 0-0000000000)
+   ============================================================ */
+function aplicarMascaraMatricula(event) {
+    let input = event.target;
+    // Remove qualquer caractere que não seja número
+    let valor = input.value.replace(/\D/g, '');
+
+    // Se tiver mais de um número, insere o traço após o primeiro dígito
+    if (valor.length > 1) {
+        valor = valor.substring(0, 1) + '-' + valor.substring(1, 11);
+    }
+
+    input.value = valor;
 }

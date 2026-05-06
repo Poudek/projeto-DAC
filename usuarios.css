@@ -297,13 +297,12 @@ body {
 }
 
 .btn-cancel {
-    background: white;
-    border: 1px solid var(--border-color);
-    padding: 10px 25px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 500;
-    color: #666;
+    background: #eee; 
+    border: none; 
+    padding: 12px 20px; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-weight: 600; 
 }
 
 .btn-save {
@@ -379,4 +378,23 @@ body {
 
 .btn-export i {
     font-size: 1.1rem;
+}
+
+/* Efeito de hover na linha da tabela */
+#lista-usuarios tr {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-left: 4px solid transparent; /* Reserva o espaço para a borda não "empurrar" o texto */
+}
+
+#lista-usuarios tr:hover {
+    background-color: rgba(39, 174, 96, 0.05); /* O mesmo verde suave do admin */
+    border-left: 4px solid #27ae60; /* Borda lateral sólida no hover */
+    transform: translateX(5px); /* Desloca levemente para a direita em vez de dar zoom */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Ajuste opcional: deixar o texto um pouco mais nítido no hover */
+#lista-usuarios tr:hover td {
+    color: #2c3e50;
 }

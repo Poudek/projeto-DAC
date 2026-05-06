@@ -35,6 +35,18 @@ function validarDados(email, senha, matricula, isCadastro = true) {
 }
 
 /* ============================================================
+   MÁSCARA DE MATRÍCULA (PADRÃO 0-0000000000)
+   ============================================================ */
+function aplicarMascaraMatricula(event) {
+    let input = event.target;
+    let valor = input.value.replace(/\D/g, ''); // Remove o que não é número
+
+    if (valor.length > 1) {
+        valor = valor.substring(0, 1) + '-' + valor.substring(1, 11);
+    }
+    input.value = valor;
+}
+/* ============================================================
    LÓGICA DE LOGIN (CORRIGIDA)
    ============================================================ */
 const loginForm = document.getElementById('loginForm');
@@ -178,21 +190,34 @@ if (cadastroForm) {
    DASHBOARD - ATUALIZAÇÃO GERAL E ESTILIZAÇÃO
    ============================================================ */
 async function atualizarDashboardGeral() {
-    // 1. Buscamos as aulas da API em vez do LocalStorage
-    let totalAulas = 0;
+    const diasSemana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+    const hojeData = new Date();
+    const hojeNome = diasSemana[hojeData.getDay()]; 
+    const hojeISO = hojeData.toISOString().split('T')[0];
+
+    let totalAulasCadastradas = 0;
+    let aulasHojeCount = 0;
+
     try {
         const resAulas = await fetch(`${API_URL}/api/agenda/aulas`);
         if (resAulas.ok) {
             const listaAulas = await resAulas.json();
-            totalAulas = listaAulas.length;
+            
+            // 1. Total absoluto de aulas na grade (Independente do dia)
+            totalAulasCadastradas = listaAulas.length;
+
+            // 2. Apenas as aulas que ocorrem hoje
+            aulasHojeCount = listaAulas.filter(aula => aula.dia === hojeNome).length;
         }
     } catch (err) {
-        console.error("Erro ao buscar aulas para o dashboard:", err);
+        console.error("Erro ao buscar aulas:", err);
     }
 
-    // Mantemos os outros (por enquanto) no LocalStorage ou migre conforme necessário
     const reunioes = JSON.parse(localStorage.getItem('minhasReunioes')) || [];
     const eventos = JSON.parse(localStorage.getItem('eventos_db')) || [];
+
+    const reunioesHoje = reunioes.filter(r => r.data === hojeISO && !r.concluida).length;
+    const eventosHoje = eventos.filter(e => e.data === hojeISO).length;
 
     const aplicarEstiloCard = (idElemento, valor) => {
         const elemento = document.getElementById(idElemento);
@@ -214,13 +239,17 @@ async function atualizarDashboardGeral() {
         }
     };
     
-    // 2. Aplicamos o valor vindo da API
-    aplicarEstiloCard('count-aulas', totalAulas);
-    aplicarEstiloCard('count-reunioes', reunioes.filter(r => !r.concluida).length);
-    aplicarEstiloCard('count-eventos-total', eventos.length);
-    aplicarEstiloCard('count-horarios', 0); 
+    // --- DISTRIBUIÇÃO DOS VALORES ---
+    
+    // O card de "Aulas" agora mostra TUDO o que você cadastrou na grade
+    aplicarEstiloCard('count-aulas', totalAulasCadastradas);
 
-    // Bloco de usuários (já estava correto buscando da API)
+    // O card de "Horários" mostra apenas o volume de compromissos para HOJE
+    aplicarEstiloCard('count-horarios', aulasHojeCount);
+
+    aplicarEstiloCard('count-reunioes', reunioesHoje);
+    aplicarEstiloCard('count-eventos-total', eventosHoje);
+
     if (document.getElementById('total-usuarios')) {
         try {
             const res = await fetch(`${API_URL}/api/usuarios`);
@@ -235,27 +264,41 @@ async function atualizarDashboardGeral() {
 /* ============================================================
    DASHBOARD E UI
    ============================================================ */
+/* ============================================================
+   INICIALIZAÇÃO GLOBAL (LOGIN, CADASTRO E DASHBOARD)
+   ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Puxar o usuário logado via Auth.js
+    // 1. Aplica a máscara em todos os campos de matrícula presentes na página atual
+    // O seletor [id*="matricula"] pega qualquer ID que contenha a palavra 'matricula'
+    const inputsMatricula = document.querySelectorAll('input[id*="matricula"]');
+    
+    inputsMatricula.forEach(input => {
+        input.setAttribute('maxlength', '12');
+        input.addEventListener('input', aplicarMascaraMatricula);
+    });
+
+    // 2. Exibição do nome do usuário no Dashboard
     const user = Auth.getUsuarioLogado();
     const userNameDisplay = document.getElementById('user-name');
     
-    // Se o elemento no seu HTML for o <h1> que diz "Bem-vindo... Usuário!", 
-    // certifique-se de que ele tem o id="user-name" ou ajuste aqui:
     if (user && userNameDisplay) {
         userNameDisplay.textContent = user.nome;
     }
 
-    // 2. Configurar o botão de Sair (Logout)
+    // 3. Configuração do Logout
     const btnSair = document.querySelector('.btn-logout') || document.getElementById('btn-sair');
     if (btnSair) {
         btnSair.addEventListener('click', (e) => {
             e.preventDefault();
-            Auth.logout(); // Usa a função centralizada no auth.js
+            Auth.logout();
         });
     }
     
-    atualizarDashboardGeral();
+    // 4. Só executa o refresh do dashboard se os cards existirem na página
+    if (document.getElementById('count-aulas')) {
+        atualizarDashboardGeral();
+    }
+    
 });
 
 function togglePassword(inputId) {

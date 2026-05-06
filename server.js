@@ -268,9 +268,19 @@ app.get('/api/eventos', (req, res) => {
 // --- EXCLUIR EVENTO ---
 app.delete('/api/eventos/:id', (req, res) => {
     const { id } = req.params;
+    console.log(`🗑️ Recebida requisição para deletar evento ID: ${id}`);
+
     const sql = "DELETE FROM tbEventos WHERE id = ?";
     db.query(sql, [id], (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
+        if (err) {
+            console.error("❌ Erro SQL ao deletar:", err);
+            return res.status(500).json({ error: err.message });
+        }
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "Evento não encontrado no banco." });
+        }
+
         res.json({ message: "Evento excluído com sucesso!" });
     });
 });
@@ -279,10 +289,20 @@ app.delete('/api/eventos/:id', (req, res) => {
 app.put('/api/eventos/:id', (req, res) => {
     const { id } = req.params;
     const { titulo, categoria, data, hora_inicio, local, descricao } = req.body;
-    const sql = "UPDATE tbEventos SET titulo=?, categoria=?, data=?, hora_inicio=?, local=?, descricao=? WHERE id=?";
+    
+    console.log(`📝 Tentativa de atualizar evento ID: ${id}`);
+
+    const sql = `
+        UPDATE tbEventos 
+        SET titulo=?, categoria=?, data=?, hora_inicio=?, local=?, descricao=? 
+        WHERE id=?`;
+
     db.query(sql, [titulo, categoria, data, hora_inicio, local, descricao, id], (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ message: "Evento atualizado!" });
+        if (err) {
+            console.error("❌ Erro SQL ao atualizar:", err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ message: "Evento atualizado com sucesso!" });
     });
 });
 

@@ -1,5 +1,6 @@
 const API_URL = "https://projeto-dac-production.up.railway.app";
 let listaEventos = [];
+let eventoIdEmEdicao = null; // 1. Movido para o topo para ser global e acessível
 
 document.addEventListener('DOMContentLoaded', () => {
     carregarEventos();
@@ -7,6 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- BUSCAR EVENTOS DO BANCO ---
 async function carregarEventos() {
+    const grid = document.querySelector('.events-grid');
+    if (grid) {
+        grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color:#a0aec0;">Sincronizando com o banco...</p>';
+    }
+
     try {
         const response = await fetch(`${API_URL}/api/eventos`);
         if (response.ok) {
@@ -15,10 +21,11 @@ async function carregarEventos() {
         }
     } catch (error) {
         console.error("Erro ao carregar eventos:", error);
+        if (grid) grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color:red;">Erro ao carregar dados.</p>';
     }
 }
 
-// --- RENDERIZAR CARDS NA TELA ---
+// --- RENDERIZAR CARDS NA TELA (COM BOTÃO EDITAR) ---
 function renderizarEventos(eventos) {
     const grid = document.querySelector('.events-grid');
     if (!grid) return;
@@ -32,7 +39,10 @@ function renderizarEventos(eventos) {
             <article class="event-card" data-category="${evento.categoria}">
                 <div class="card-header">
                     <span class="tag ${categoriaClasse}"><i class="fas fa-tag"></i> ${evento.categoria}</span>
-                    <button class="delete-btn" onclick="deletarEvento(${evento.id})"><i class="far fa-trash-alt"></i></button>
+                    <div class="card-actions">
+                        <button class="edit-btn" onclick="editarEvento(${evento.id})"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deletarEvento(${evento.id})"><i class="far fa-trash-alt"></i></button>
+                    </div>
                 </div>
                 <h3 class="event-title">${evento.titulo}</h3>
                 <div class="event-info">
@@ -48,60 +58,77 @@ function renderizarEventos(eventos) {
     });
 }
 
-// --- SALVAR NOVO EVENTO (COM CORREÇÃO DE MAPEAMENTO) ---
+// --- FUNÇÃO SALVAR ÚNICA (UNIFICA NOVO E EDIÇÃO) ---
 window.salvarEvento = async function(e) {
     if (e) e.preventDefault();
-    console.log("🚀 Iniciando salvamento...");
-
+    
     const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
 
-    // Captura dos valores do HTML
-    const inputTitulo = document.getElementById('tituloEvento');
-    const inputData   = document.getElementById('dataEvento');
-    const inputCat    = document.getElementById('categoriaEvento');
-    const inputHora   = document.getElementById('horaInicioEvento'); // ID do HTML
-    const inputLocal  = document.getElementById('localEvento');
-    const inputDesc   = document.getElementById('descricaoEvento');
-
-    // Montagem do objeto JSON
     const dados = {
-        titulo: inputTitulo.value,
-        data: inputData.value,
-        categoria: inputCat.value,
-        
-        // CHAVE QUE VAI PARA O SERVIDOR:
-        hora_inicio: inputHora.value, 
-        
-        local: inputLocal.value,
-        descricao: inputDesc ? inputDesc.value : "",
-        
-        // Agora usamos o usuario_id que você confirmou existir
+        titulo: document.getElementById('tituloEvento').value,
+        data: document.getElementById('dataEvento').value,
+        categoria: document.getElementById('categoriaEvento').value,
+        hora_inicio: document.getElementById('horaInicioEvento').value,
+        local: document.getElementById('localEvento').value,
+        descricao: document.getElementById('descricaoEvento').value || "",
         usuario_id: usuarioLogado ? usuarioLogado.id : null
     };
 
-    console.log("Dados que serão enviados:", dados);
+    // 2. Lógica de URL e Método baseada no ID de edição
+    const url = eventoIdEmEdicao ? `${API_URL}/api/eventos/${eventoIdEmEdicao}` : `${API_URL}/api/eventos`;
+    const metodo = eventoIdEmEdicao ? 'PUT' : 'POST';
 
     try {
-        const response = await fetch(`${API_URL}/api/eventos`, {
-            method: 'POST',
+        const response = await fetch(url, {
+            method: metodo,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)
         });
 
         if (response.ok) {
-            alert("✅ Evento salvo no banco e sincronizado!");
-            localStorage.removeItem('eventos_db'); // Limpa o "fantasma" do localStorage
+            alert(eventoIdEmEdicao ? "✅ Evento atualizado!" : "✅ Evento criado!");
+            eventoIdEmEdicao = null; 
             closeModal();
-            carregarEventos(); // Atualiza a lista na tela de eventos
-        } else {
-            const erro = await response.json();
-            alert("❌ Erro ao salvar: " + (erro.error || "Verifique o console"));
-            console.error("Erro detalhado da API:", erro);
+            carregarEventos();
         }
     } catch (error) {
-        console.error("❌ Erro de conexão:", error);
-        alert("Erro ao conectar com a Railway.");
+        console.error("Erro ao salvar:", error);
     }
+}; // 3. Fechamento correto da função salvarEvento
+
+// --- EXCLUIR EVENTO (GLOBAL) ---
+window.deletarEvento = async function(id) {
+    if (!confirm("⚠️ Tem certeza que deseja excluir este evento?")) return;
+
+    try {
+        const response = await fetch(`${API_URL}/api/eventos/${id}`, { method: 'DELETE' });
+        if (response.ok) {
+            alert("🗑️ Evento removido!");
+            carregarEventos();
+        }
+    } catch (error) {
+        console.error("Erro ao deletar:", error);
+    }
+};
+
+// --- PREPARAR EDIÇÃO ---
+window.editarEvento = function(id) {
+    const evento = listaEventos.find(e => e.id === id);
+    if (!evento) return;
+
+    eventoIdEmEdicao = id; 
+
+    document.getElementById('tituloEvento').value = evento.titulo;
+    document.getElementById('dataEvento').value = evento.data.split('T')[0];
+    document.getElementById('categoriaEvento').value = evento.categoria;
+    document.getElementById('horaInicioEvento').value = evento.hora_inicio;
+    document.getElementById('localEvento').value = evento.local;
+    document.getElementById('descricaoEvento').value = evento.descricao;
+
+    const tituloModal = document.querySelector('#modalEvento h2');
+    if (tituloModal) tituloModal.innerText = "Alterar Evento";
+    
+    openModal();
 };
 
 // --- FILTROS ---
@@ -126,6 +153,10 @@ window.openModal = () => {
 window.closeModal = () => {
     const modal = document.getElementById('modalEvento');
     const form = document.getElementById('formEvento');
+    const tituloModal = document.querySelector('#modalEvento h2');
+
     if (modal) modal.style.display = 'none';
     if (form) form.reset();
+    if (tituloModal) tituloModal.innerText = "Novo Evento"; // Reseta o título ao fechar
+    eventoIdEmEdicao = null; // Limpa o ID para o próximo não ser uma edição por engano
 };

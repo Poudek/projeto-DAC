@@ -265,6 +265,27 @@ app.get('/api/eventos', (req, res) => {
     });
 });
 
+// --- EXCLUIR EVENTO ---
+app.delete('/api/eventos/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = "DELETE FROM tbEventos WHERE id = ?";
+    db.query(sql, [id], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: "Evento excluído com sucesso!" });
+    });
+});
+
+// --- ALTERAR EVENTO ---
+app.put('/api/eventos/:id', (req, res) => {
+    const { id } = req.params;
+    const { titulo, categoria, data, hora_inicio, local, descricao } = req.body;
+    const sql = "UPDATE tbEventos SET titulo=?, categoria=?, data=?, hora_inicio=?, local=?, descricao=? WHERE id=?";
+    db.query(sql, [titulo, categoria, data, hora_inicio, local, descricao, id], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: "Evento atualizado!" });
+    });
+});
+
 /* ============================================================
    INICIALIZAÇÃO
    ============================================================ */

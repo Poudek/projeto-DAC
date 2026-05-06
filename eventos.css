@@ -449,3 +449,21 @@ input[type="time"],
 .btn-save:hover {
     filter: brightness(0.9);
 }
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-btn {
+    background: none;
+    border: none;
+    color: #4a5568;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+
+.edit-btn:hover {
+    color: #3182ce; /* Azul ao passar o mouse */
+}

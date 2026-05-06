@@ -32,9 +32,13 @@
 
 <main class="content-container">
     <div class="top-actions">
+        <button onclick="exportarUsuariosPDF()" class="btn-export">
+    <i class="fas fa-file-pdf"></i> Exportar para PDF
+            </button>
         <button class="btn-nova-aula" id="btnAbrirModalAula">
             <i class="fa-solid fa-plus"></i> Nova Aula
         </button>
+        
     </div>
 
         <div class="table-card">
@@ -126,7 +130,8 @@
         </form>
     </div>
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 <script src="auth.js"></script>
 <script src="script.js"></script>
 <script src="aulas.js"></script>

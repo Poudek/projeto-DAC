@@ -3,8 +3,19 @@ if (typeof API_URL === 'undefined') {
     window.API_URL = "https://projeto-dac-production.up.railway.app";
 }
 
+
 let minhasAulas = []; 
 let aulaEmEdicaoId = null; 
+
+// Função para carregar imagem local e retornar uma Promise
+const carregarImagemLocal = (url) => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = (err) => reject(err);
+        img.src = url;
+    });
+};
 
 function obterUsuarioLogado() {
     const usuario = localStorage.getItem('usuarioLogado');
@@ -196,3 +207,57 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnCancelar) btnCancelar.onclick = fecharModal;
     if (btnFecharX) btnFecharX.onclick = fecharModal;
 });
+
+/* ============================================================
+    6. EXPORTAÇÃO PARA PDF
+   ============================================================ */
+async function exportarUsuariosPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('l', 'mm', 'a4'); // Modo Paisagem
+
+    try {
+        // 1. Carrega a imagem local (ajuste o nome do arquivo para o seu)
+        const logo = await carregarImagemLocal('imgs/logo-unifametro.png');
+        
+        // 2. Adiciona no canto superior direito (x=250, y=10, largura=30, altura=30)
+        // O valor 250 posiciona bem próximo à borda direita de uma folha A4 (297mm)
+        doc.addImage(logo, 'PNG', 220, 10, 60, 30);
+    } catch (error) {
+        console.warn("A imagem local não foi encontrada ou não pôde ser carregada.", error);
+    }
+
+    // --- Títulos e Dados (Mesma lógica anterior) ---
+    doc.setFontSize(18);
+    doc.setTextColor(45, 122, 80); 
+    doc.text("Relatório de Grade Horária", 14, 15);
+
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    const dataGeracao = new Date().toLocaleDateString('pt-BR');
+    const user = obterUsuarioLogado();
+    const nomeUsuario = user ? (user.nome || user.usuario) : "Wesley Costa"; 
+    doc.text(`Gerado em: ${dataGeracao} | Usuário: ${nomeUsuario}`, 14, 22);
+
+    const columns = ["Disciplina", "Turma", "Sala", "Dia", "Horário"];
+    const rows = minhasAulas.map(aula => [
+        aula.disciplina,
+        aula.turma,
+        aula.sala,
+        aula.dia,
+        aula.horario
+    ]);
+
+    doc.autoTable({
+        head: [columns],
+        body: rows,
+        startY: 40, // Aumentamos para não sobrepor a logo
+        theme: 'striped',
+        headStyles: { fillColor: [45, 122, 80] },
+        alternateRowStyles: { fillColor: [240, 248, 243] }
+    });
+
+    doc.save(`Grade_Horaria_${dataGeracao.replace(/\//g, '-')}.pdf`);
+}
+
+// Torna a função global para ser achada pelo 'onclick' do HTML
+window.exportarUsuariosPDF = exportarUsuariosPDF;

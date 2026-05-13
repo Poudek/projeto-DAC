@@ -232,26 +232,40 @@ window.removerUsuario = async function(id) {
 };
 
 /* ============================================================
-   EXPORTAÇÃO PDF
+   6. EXPORTAÇÃO PDF DINÂMICA (FILTRADA) COM LOGO
    ============================================================ */
-/* ============================================================
-   EXPORTAÇÃO PDF DINÂMICA (FILTRADA)
-   ============================================================ */
+
+// Função auxiliar para carregar a logo local
+const carregarImagemLocal = (url) => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = (err) => reject(err);
+        img.src = url;
+    });
+};
+
 window.exportarUsuariosPDF = async function() {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    const doc = new jsPDF(); // 'p', 'mm', 'a4' padrão
     const verde = [39, 174, 96];
 
-    // 1. Pegamos todas as linhas da tabela que estão visíveis no momento
+    // 1. Carregamento da Logo (Canto Superior Direito)
+    try {
+        const logo = await carregarImagemLocal('imgs/logo-unifametro.png');
+        // Posicionamento: x=170 (numa folha de 210mm), y=10, largura=25, altura=25
+        doc.addImage(logo, 'PNG', 160, 10, 50, 25);
+    } catch (error) {
+        console.warn("Logo local não encontrada para o PDF de usuários.", error);
+    }
+
+    // 2. Coleta de dados da tabela visível
     const linhasTabela = document.querySelectorAll('#lista-usuarios tr');
-    
-    // 2. Se a tabela estiver vazia (ou com a mensagem de "Nenhum usuário"), avisamos o usuário
     if (linhasTabela.length === 0 || (linhasTabela.length === 1 && linhasTabela[0].innerText.includes("Nenhum"))) {
         alert("Não há dados visíveis para exportar.");
         return;
     }
 
-    // 3. Extraímos os dados diretamente das células da tabela
     const dadosParaPDF = [];
     linhasTabela.forEach(linha => {
         const colunas = linha.querySelectorAll('td');
@@ -264,34 +278,31 @@ window.exportarUsuariosPDF = async function() {
         }
     });
 
-    // 4. Identificamos qual filtro está ativo para colocar no título do PDF
     const botaoAtivo = document.querySelector('.toggle-user button.active');
     const categoriaNome = botaoAtivo ? botaoAtivo.innerText : "Geral";
 
-    // Design do PDF
+    // 3. Design do Cabeçalho
     doc.setFontSize(18);
     doc.setTextColor(...verde);
     doc.text(`Relatório de Usuários - ${categoriaNome}`, 14, 20);
     
     doc.setDrawColor(...verde);
-    doc.line(14, 23, 196, 23);
+    doc.line(14, 23, 160, 23); // Linha um pouco menor para não bater na logo
 
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 14, 28);
 
-    const colunasCabeçalho = ["Nome", "E-mail", "Cargo"];
-
+    // 4. Geração da Tabela
     doc.autoTable({
-        head: [colunasCabeçalho],
+        head: [["Nome", "E-mail", "Cargo"]],
         body: dadosParaPDF,
-        startY: 35,
+        startY: 40, // Começa após a logo e título
         theme: 'striped',
         headStyles: { fillColor: verde, textColor: 255 },
         alternateRowStyles: { fillColor: [235, 245, 238] }
     });
 
-    // Nome do arquivo dinâmico baseado no filtro
     const nomeArquivo = `usuarios_${categoriaNome.toLowerCase().replace(/\s/g, '_')}_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`;
     doc.save(nomeArquivo);
 };

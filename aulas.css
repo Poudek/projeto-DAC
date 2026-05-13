@@ -155,11 +155,17 @@ body {
     box-shadow: 0 15px 40px rgba(0,0,0,0.2);
     animation: animarModal 0.3s ease-out;
     position: relative; /* ADICIONE ISSO */
+    max-height: 90vh; /* Não deixa o modal ser maior que 90% da tela */
+    overflow-y: auto;
 }
 
 @keyframes animarModal {
     from { transform: translateY(-50px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
+}
+
+select#materia {
+    max-height: 200px;
 }
 
 .modal-header h2 { color: #333; margin-bottom: 5px; }

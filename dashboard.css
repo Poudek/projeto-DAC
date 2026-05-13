@@ -103,7 +103,16 @@ html, body {
     margin: 10px 0 25px 0;
 }
 
-.logout-section { margin-top: auto; }
+.logout-section {
+    margin-top: auto; /* Força o botão para baixo se não usar space-between */
+     
+    margin-bottom: 36px; /* Espaço extra para o botão não sumir */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: white;
+}
 
 /* Top Nav */
 .top-nav { display: flex; justify-content: space-between; padding: 15px 50px; border-bottom: 1px solid var(--border-color); background: white; }

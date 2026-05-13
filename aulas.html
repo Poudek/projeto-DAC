@@ -32,9 +32,9 @@
 
 <main class="content-container">
     <div class="top-actions">
-        <button onclick="exportarUsuariosPDF()" class="btn-export">
-    <i class="fas fa-file-pdf"></i> Exportar para PDF
-            </button>
+        <button onclick="exportarUsuariosPDF()" class="btn-export" id="btn-export-pdf">
+            <i class="fas fa-file-pdf"></i> Exportar para PDF
+        </button>
         <button class="btn-nova-aula" id="btnAbrirModalAula">
             <i class="fa-solid fa-plus"></i> Nova Aula
         </button>
@@ -80,7 +80,7 @@
             <div class="input-row">
                 <div class="input-group" style="flex: 2;">
                     <label>Disciplina *</label>
-                    <select id="materia" required>
+                    <select id="materia" required onfocus="this.size=5;" onblur="this.size=1;" onchange="this.size=1; this.blur();">
                         <option value="">Selecione a matéria...</option>
                         <option value="Desenvolvimento de Aplicações Corporativas">Desenvolvimento de Aplicações Corporativas</option>
                         <option value="Tópicos Especiais em Sistemas de Informação">Tópicos Especiais em Sistemas de Informação</option>
@@ -88,6 +88,13 @@
                         <option value="Métodos Avançados de Programação">Métodos Avançados de Programação</option>
                         <option value="Computação em Nuvem">Computação em Nuvem</option>
                         <option value="Inteligência Artificial">Inteligência Artificial</option>
+                        <option value="Engenharia de Software">Engenharia de Software</option>
+                        <option value="Banco de Dados">Banco de Dados</option>
+                        <option value="Redes de Computadores">Redes de Computadores</option>
+                        <option value="Sistemas Operacionais">Sistemas Operacionais</option>
+                        <option value="Programação Web">Programação Web</option>
+                        <option value="Programação Mobile">Programação Mobile</option>
+                        <option value="Análise de Algoritmos">Análise de Algoritmos</option>
                         </select>
                 </div>
                 <div class="input-group">
@@ -131,7 +138,7 @@
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <script src="auth.js"></script>
 <script src="script.js"></script>
 <script src="aulas.js"></script>

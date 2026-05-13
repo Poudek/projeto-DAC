@@ -197,27 +197,36 @@ async function atualizarDashboardGeral() {
 
     let totalAulasCadastradas = 0;
     let aulasHojeCount = 0;
+    let eventosHojeCount = 0; // Nova variável para o banco
 
     try {
+        // 1. BUSCA AULAS (API)
         const resAulas = await fetch(`${API_URL}/api/agenda/aulas`);
         if (resAulas.ok) {
             const listaAulas = await resAulas.json();
-            
-            // 1. Total absoluto de aulas na grade (Independente do dia)
             totalAulasCadastradas = listaAulas.length;
-
-            // 2. Apenas as aulas que ocorrem hoje
             aulasHojeCount = listaAulas.filter(aula => aula.dia === hojeNome).length;
         }
+
+        // 2. BUSCA EVENTOS (API) - Ajuste aqui
+        const resEventos = await fetch(`${API_URL}/api/eventos`); // Certifique-se que a rota é esta
+        if (resEventos.ok) {
+            const listaEventos = await resEventos.json();
+            // Filtra os eventos que acontecem hoje, comparando com a data do banco
+            eventosHojeCount = listaEventos.filter(e => {
+                // Ajuste o campo 'e.data' conforme o nome da coluna no seu banco (ex: data_evento)
+                const dataFormatada = new Date(e.data).toISOString().split('T')[0];
+                return dataFormatada === hojeISO;
+            }).length;
+        }
+
     } catch (err) {
-        console.error("Erro ao buscar aulas:", err);
+        console.error("Erro ao buscar dados da API:", err);
     }
 
+    // Mantém o LocalStorage apenas para Reuniões (se ainda não migrou para o banco)
     const reunioes = JSON.parse(localStorage.getItem('minhasReunioes')) || [];
-    const eventos = JSON.parse(localStorage.getItem('eventos_db')) || [];
-
     const reunioesHoje = reunioes.filter(r => r.data === hojeISO && !r.concluida).length;
-    const eventosHoje = eventos.filter(e => e.data === hojeISO).length;
 
     const aplicarEstiloCard = (idElemento, valor) => {
         const elemento = document.getElementById(idElemento);
@@ -239,17 +248,16 @@ async function atualizarDashboardGeral() {
         }
     };
     
-    // --- DISTRIBUIÇÃO DOS VALORES ---
-    
-    // O card de "Aulas" agora mostra TUDO o que você cadastrou na grade
+    // --- DISTRIBUIÇÃO DOS VALORES ATUALIZADA ---
     aplicarEstiloCard('count-aulas', totalAulasCadastradas);
-
-    // O card de "Horários" mostra apenas o volume de compromissos para HOJE
-    aplicarEstiloCard('count-horarios', aulasHojeCount);
-
     aplicarEstiloCard('count-reunioes', reunioesHoje);
-    aplicarEstiloCard('count-eventos-total', eventosHoje);
+    // Card de Horários: Aulas de hoje + Eventos de hoje
+    const totalCompromissosHoje = aulasHojeCount + eventosHojeCount;
+    aplicarEstiloCard('count-horarios', totalCompromissosHoje);
+    // Agora usa o valor vindo do Banco de Dados
+    aplicarEstiloCard('count-eventos-total', eventosHojeCount);
 
+    // BUSCA USUÁRIOS (API)
     if (document.getElementById('total-usuarios')) {
         try {
             const res = await fetch(`${API_URL}/api/usuarios`);
